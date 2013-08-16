@@ -78,10 +78,61 @@ RemoteSSH call:
 	   
 	   
 	   
+# RemoteSSH Variations in how it is called
+
+    RemoteSSH rsh=RemoteSSH(String host, String usercommand)
+    RemoteSSH rsh=new RemoteSSH(String host, String sudo, String usercommand) 
+    RemoteSSH rsh=new RemoteSSH(String host, String user, String sudo, String usercommand) 
+    RemoteSSH rsh=new RemoteSSH(String host, String user, String sudo, String usercommand,String filter) 
+    RemoteSSH rsh=new RemoteSSH(String host, String user, String sudo, String usercommand, Integer port) 
+    RemoteSSH rsh=new RemoteSSH(String host, String user, String sudo, String usercommand,String filter, Integer port) 
+    RemoteSSH rsh=new RemoteSSH(String host, String user, String userpass, String sudo, String usercommand,String filter,Integer port) 
 
 
+# RemoteSSH With some more examples of above calls:
 
-Controller containing all of this plugin uses:
+         // First example overrides config.groovy remotessh.USER so it uses the construct with sudo and runs uptime
+        // This then reads in the key config and keypass and connects via ssh to remote host 
+	   RemoteSSH ash4=new RemoteSSH('1xx.xx.xxx.xx', 'remoteuser', 'sudo', 'uptime')
+	   def result3=ash4.Result(sshConfig)
+	
+        //If I had defined the same user in my global config and the correct port etc then I could have just used:
+           RemoteSSH rsh=RemoteSSH(String host, String usercommand)
+         
+         
+# RemoteSCP Call types:
+
+     RemoteSCP rscp=new RemoteSCP(String host, String file, String remotedir) 
+     RemoteSCP rscp=new RemoteSCP(String host, String user, String file, String remotedir) 
+     RemoteSCP rscp=new RemoteSCP(String host, String user, String userpass, String file, String remotedir) 
+     RemoteSCP rscp=new RemoteSCP(String host, String file, String remotedir, Integer port) 
+     RemoteSCP rscp=new RemoteSCP(String host, String user, String file, String remotedir, Integer port) 
+     RemoteSCP rscp=new RemoteSCP(String host, String user, String userpass, String file, String remotedir, Integer port) 
+
+
+# RemoteSCPDir call types:
+
+    RemoteSCPDir rscpdir=new RemoteSCPDir(String hostname, String localdir,String remotedir) 
+    RemoteSCPDir rscpdir=new RemoteSCPDir(String hostname, String user, String localdir,String remotedir) 
+    RemoteSCPDir rscpdir=new RemoteSCPDir(String hostname, String user,String userpass, String localdir,String remotedir) 
+    RemoteSCPDir rscpdir=new RemoteSCPDir(String hostname, String localdir,String remotedir, Integer port) 
+    RemoteSCPDir rscpdir=new RemoteSCPDir(String hostname, String user, String localdir,String remotedir, Integer port) 
+    RemoteSCPDir rscpdir=new RemoteSCPDir(String hostname, String user, String userpass, String localdir,String remotedir, Integer port) 
+
+
+# RemoteSCPGet call types:
+
+    RemoteSCPGet rscpdir=new RemoteSCPGet(String host, String file, String localdir) 
+    RemoteSCPGet rscpdir=new RemoteSCPGet(String host, String user, String file, String localdir) 
+    RemoteSCPGet rscpdir=new RemoteSCPGet(String host, String user, String userpass, String file, String localdir) 
+    RemoteSCPGet rscpdir=new RemoteSCPGet(String host, String file, String localdir,Integer port) 
+    RemoteSCPGet rscpdir=new RemoteSCPGet(String host, String user, String file, String localdir,Integer port) 
+    RemoteSCPGet rscpdir=new RemoteSCPGet(String host, String user, String userpass, String file, String localdir,Integer port) 
+
+  
+
+
+## Controller containing all of this plugin in use:
 
     import ssh.RemoteSCP
     import ssh.RemoteSCPDir
