@@ -11,10 +11,6 @@ import ch.ethz.ssh2.Connection;
 import ch.ethz.ssh2.Session;
 import ch.ethz.ssh2.StreamGobbler;
 
-/**
- *
- * 
- */
 public class RemoteSSH  {
 	String host = "";
 	String user = "";
@@ -35,7 +31,7 @@ public class RemoteSSH  {
 		this.sudo = sudo;
 		this.usercommand = usercommand;
 	}
-	
+
 	public RemoteSSH(String host, String user, String sudo, String usercommand) {
 		this.host = host;
 		this.user = user;
@@ -72,13 +68,9 @@ public class RemoteSSH  {
 		this.usercommand = usercommand;
 		this.filter = filter;
 		this.port=port;
-		
 	}
 
-
-
-
-	public String Result() throws IOException, InterruptedException {
+	public String Result() throws InterruptedException {
 		// Call SSHController and get values from SSHConfig.groovy held in conf folder of your APP!
 		// This returns ssh.USER KEY KEYPASS AND PORT TO THIS java class
 		SSHController ac=new SSHController();
@@ -102,24 +94,22 @@ public class RemoteSSH  {
 		}
 		String hostname = host;
 		String username = user;
-		File keyfile = new File(sshkey.toString()); 
+		File keyfile = new File(sshkey.toString());
 		String keyfilePass = sshkeypass.toString();
 		try {
-			
-			
 			if (port==0){port=22; }
 			Connection conn = new Connection(hostname,port);
 			/* Now connect */
 			conn.connect();
 			/* Authenticate */
 			boolean isAuthenticated=false;
-			if (userpass.equals("")) { 
+			if (userpass.equals("")) {
 				isAuthenticated = conn.authenticateWithPublicKey(username,
 					keyfile, keyfilePass);
 			}else{
 				isAuthenticated = conn.authenticateWithPassword(username,userpass);
 			}
-			
+
 			if (isAuthenticated == false)
 				throw new IOException("Authentication failed.");
 			/* Create a session */
@@ -138,8 +128,7 @@ public class RemoteSSH  {
 			sess.getStdin().write("exit\n".getBytes());
 			Thread.sleep(10);
 			InputStream stdout = new StreamGobbler(sess.getStdout());
-			BufferedReader br = new BufferedReader(
-					new InputStreamReader(stdout));
+			BufferedReader br = new BufferedReader(new InputStreamReader(stdout));
 			// output.append("Remote execution of "+usercommand+" returned:<br>");
 			while (true) {
 				String line = br.readLine();

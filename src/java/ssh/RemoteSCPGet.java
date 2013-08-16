@@ -1,6 +1,5 @@
 package ssh;
 
-
 import java.io.File;
 import java.io.IOException;
 
@@ -9,7 +8,7 @@ import ch.ethz.ssh2.Connection;
 import ch.ethz.ssh2.SCPClient;
 
 /**
- * RemoteSCPGet Class used by AddFTP and AddServerRemote classes This uses
+ * Used by AddFTP and AddServerRemote classes This uses
  * SSHConfig Interface Gets files from remote hosts
  */
 public class RemoteSCPGet  {
@@ -20,9 +19,9 @@ public class RemoteSCPGet  {
 	String userpass="";
 	String file = "";
 	String localdir = "";
-
 	String usercommand = "";
 	String output = "";
+
 	public RemoteSCPGet(String host, String file, String localdir) {
 		this.host = host;
 		this.file = file;
@@ -64,46 +63,43 @@ public class RemoteSCPGet  {
 		this.port=port;
 	}
 
-
-
-
-	public String Result() throws IOException, InterruptedException {
-				SSHController ac=new SSHController();
-				Object sshuser=ac.getConfig("ssh.USER");
-				Object sshpass=ac.getConfig("ssh.PASS");
-				Object sshkey=ac.getConfig("ssh.KEY");
-				Object sshkeypass=ac.getConfig("ssh.KEYPASS");
-				Object sshport=ac.getConfig("ssh.PORT");
-				//System.out.println("----"+sshuser.toString());
-				if (user.equals("")) {
-					user = sshuser.toString();
-				}
-				if (userpass.equals("")) {
-					userpass = sshpass.toString();
-				}
-				if (port==0) {
-					String sps=sshport.toString();
-					if (sps.matches("[0-9]+")) {
-						port=Integer.parseInt(sps);
-					}
-				}
-				String hostname = host;
-				String username = user;
-				File keyfile = new File(sshkey.toString()); 
-				String keyfilePass = sshkeypass.toString();
-				try {
-					if (port==0){port=22; }
-					Connection conn = new Connection(hostname,port);
-					/* Now connect */
-					conn.connect();
-					/* Authenticate */
-					boolean isAuthenticated=false;
-					if (userpass.equals("")) { 
-						isAuthenticated = conn.authenticateWithPublicKey(username,
-								keyfile, keyfilePass);
-					}else{
-						isAuthenticated = conn.authenticateWithPassword(username,userpass);
-					}
+	public String Result() {
+		SSHController ac=new SSHController();
+		Object sshuser=ac.getConfig("ssh.USER");
+		Object sshpass=ac.getConfig("ssh.PASS");
+		Object sshkey=ac.getConfig("ssh.KEY");
+		Object sshkeypass=ac.getConfig("ssh.KEYPASS");
+		Object sshport=ac.getConfig("ssh.PORT");
+		//System.out.println("----"+sshuser.toString());
+		if (user.equals("")) {
+			user = sshuser.toString();
+		}
+		if (userpass.equals("")) {
+			userpass = sshpass.toString();
+		}
+		if (port==0) {
+			String sps=sshport.toString();
+			if (sps.matches("[0-9]+")) {
+				port=Integer.parseInt(sps);
+			}
+		}
+		String hostname = host;
+		String username = user;
+		File keyfile = new File(sshkey.toString());
+		String keyfilePass = sshkeypass.toString();
+		try {
+			if (port==0){port=22; }
+			Connection conn = new Connection(hostname,port);
+			/* Now connect */
+			conn.connect();
+			/* Authenticate */
+			boolean isAuthenticated=false;
+			if (userpass.equals("")) {
+				isAuthenticated = conn.authenticateWithPublicKey(username,
+						keyfile, keyfilePass);
+			}else{
+				isAuthenticated = conn.authenticateWithPassword(username,userpass);
+			}
 
 			if (isAuthenticated == false)
 				throw new IOException("Authentication failed.");

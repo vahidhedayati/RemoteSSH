@@ -1,4 +1,5 @@
 package ssh;
+
 import java.io.File;
 import java.io.IOException;
 
@@ -9,9 +10,7 @@ import ch.ethz.ssh2.SCPClient;
 import ch.ethz.ssh2.Session;
 
 /**
- * RemoteSCPDir class called by IncludeUpdate class scps a folder to specified
- * end server
- * 
+ * Called by IncludeUpdate class scps a folder to specified end server.
  */
 public class RemoteSCPDir  {
 
@@ -21,9 +20,9 @@ public class RemoteSCPDir  {
 	String userpass="";
 	String localdir = "";
 	String remotedir = "";
-
 	String usercommand = "";
 	String output = "";
+
 	public RemoteSCPDir(String hostname, String localdir,String remotedir) {
 		this.hostname = hostname;
 		this.localdir = localdir;
@@ -64,8 +63,8 @@ public class RemoteSCPDir  {
 		this.port=port;
 	}
 
-	public String Result() throws IOException, InterruptedException {
-		
+	public String Result() {
+
 		SSHController ac=new SSHController();
 		Object sshuser=ac.getConfig("ssh.USER");
 		Object sshpass=ac.getConfig("ssh.PASS");
@@ -86,7 +85,7 @@ public class RemoteSCPDir  {
 			}
 		}
 		String username = user;
-		File keyfile = new File(sshkey.toString()); 
+		File keyfile = new File(sshkey.toString());
 		String keyfilePass = sshkeypass.toString();
 		try {
 			if (port==0){port=22; }
@@ -95,7 +94,7 @@ public class RemoteSCPDir  {
 			conn.connect();
 			/* Authenticate */
 			boolean isAuthenticated=false;
-			if (userpass.equals("")) { 
+			if (userpass.equals("")) {
 				isAuthenticated = conn.authenticateWithPublicKey(username,
 						keyfile, keyfilePass);
 			}else{
@@ -133,7 +132,5 @@ public class RemoteSCPDir  {
 				scpc.put(fullFileName, remoteTargetDirectory, mode);
 			}
 		}
-
 	}
-
 }

@@ -8,8 +8,7 @@ import ch.ethz.ssh2.Connection;
 import ch.ethz.ssh2.SCPClient;
 
 /**
- * RemoteSCP class copies a file to remote server
- * 
+ * Copies a file to remote server.
  */
 public class RemoteSCP {
 
@@ -19,24 +18,21 @@ public class RemoteSCP {
 	String userpass="";
 	String file = "";
 	String remotedir = "";
-
 	String usercommand = "";
 	String output = "";
+
 	public RemoteSCP(String host, String file, String remotedir) {
-		// super();
 		this.host = host;
 		this.file = file;
 		this.remotedir = remotedir;
 	}
 	public RemoteSCP(String host, String user, String file, String remotedir) {
-		// super();
 		this.host = host;
 		this.user = user;
 		this.file = file;
 		this.remotedir = remotedir;
 	}
 	public RemoteSCP(String host, String user, String userpass, String file, String remotedir) {
-		// super();
 		this.host = host;
 		this.user = user;
 		this.userpass=userpass;
@@ -44,14 +40,12 @@ public class RemoteSCP {
 		this.remotedir = remotedir;
 	}
 	public RemoteSCP(String host, String file, String remotedir, Integer port) {
-		// super();
 		this.host = host;
 		this.file = file;
 		this.remotedir = remotedir;
 		this.port=port;
 	}
 	public RemoteSCP(String host, String user, String file, String remotedir, Integer port) {
-		// super();
 		this.host = host;
 		this.user = user;
 		this.file = file;
@@ -59,7 +53,6 @@ public class RemoteSCP {
 		this.port=port;
 	}
 	public RemoteSCP(String host, String user, String userpass,  String file, String remotedir, Integer port) {
-		// super();
 		this.host = host;
 		this.user = user;
 		this.userpass=userpass;
@@ -68,9 +61,7 @@ public class RemoteSCP {
 		this.port=port;
 	}
 
-
-	
-	public String Result() throws IOException, InterruptedException {	
+	public String Result() {
 		SSHController ac=new SSHController();
 		Object sshuser=ac.getConfig("ssh.USER");
 		Object sshpass=ac.getConfig("ssh.PASS");
@@ -92,7 +83,7 @@ public class RemoteSCP {
 		}
 		String hostname = host;
 		String username = user;
-		File keyfile = new File(sshkey.toString()); 
+		File keyfile = new File(sshkey.toString());
 		String keyfilePass = sshkeypass.toString();
 		try {
 		if (port==0){port=22; }
@@ -101,7 +92,7 @@ public class RemoteSCP {
 			conn.connect();
 			/* Authenticate */
 			boolean isAuthenticated=false;
-			if (userpass.equals("")) { 
+			if (userpass.equals("")) {
 				isAuthenticated = conn.authenticateWithPublicKey(username,
 						keyfile, keyfilePass);
 			}else{
