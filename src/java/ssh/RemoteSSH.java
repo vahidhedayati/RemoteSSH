@@ -1,20 +1,17 @@
 package ssh;
 
+import grails.plugin.remotessh.SshConfig;
+
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 
-import remotessh.SSHController;
 import ch.ethz.ssh2.Connection;
 import ch.ethz.ssh2.Session;
 import ch.ethz.ssh2.StreamGobbler;
 
-/**
- *
- * 
- */
 public class RemoteSSH  {
 	String host = "";
 	String user = "";
@@ -35,7 +32,7 @@ public class RemoteSSH  {
 		this.sudo = sudo;
 		this.usercommand = usercommand;
 	}
-	
+
 	public RemoteSSH(String host, String user, String sudo, String usercommand) {
 		this.host = host;
 		this.user = user;
@@ -72,21 +69,14 @@ public class RemoteSSH  {
 		this.usercommand = usercommand;
 		this.filter = filter;
 		this.port=port;
-		
 	}
 
-
-
-
-	public String Result() throws IOException, InterruptedException {
-		// Call SSHController and get values from SSHConfig.groovy held in conf folder of your APP!
-		// This returns ssh.USER KEY KEYPASS AND PORT TO THIS java class
-		SSHController ac=new SSHController();
-		Object sshuser=ac.getConfig("ssh.USER");
-		Object sshpass=ac.getConfig("ssh.PASS");
-		Object sshkey=ac.getConfig("ssh.KEY");
-		Object sshkeypass=ac.getConfig("ssh.KEYPASS");
-		Object sshport=ac.getConfig("ssh.PORT");
+	public String Result(SshConfig ac) throws InterruptedException {
+		Object sshuser=ac.getConfig("USER");
+		Object sshpass=ac.getConfig("PASS");
+		Object sshkey=ac.getConfig("KEY");
+		Object sshkeypass=ac.getConfig("KEYPASS");
+		Object sshport=ac.getConfig("PORT");
 		//System.out.println("----"+sshuser.toString());
 		if (user.equals("")) {
 			user = sshuser.toString();
@@ -102,24 +92,22 @@ public class RemoteSSH  {
 		}
 		String hostname = host;
 		String username = user;
-		File keyfile = new File(sshkey.toString()); 
+		File keyfile = new File(sshkey.toString());
 		String keyfilePass = sshkeypass.toString();
 		try {
-			
-			
 			if (port==0){port=22; }
 			Connection conn = new Connection(hostname,port);
 			/* Now connect */
 			conn.connect();
 			/* Authenticate */
 			boolean isAuthenticated=false;
-			if (userpass.equals("")) { 
+			if (userpass.equals("")) {
 				isAuthenticated = conn.authenticateWithPublicKey(username,
 					keyfile, keyfilePass);
 			}else{
 				isAuthenticated = conn.authenticateWithPassword(username,userpass);
 			}
-			
+
 			if (isAuthenticated == false)
 				throw new IOException("Authentication failed.");
 			/* Create a session */
@@ -138,18 +126,17 @@ public class RemoteSSH  {
 			sess.getStdin().write("exit\n".getBytes());
 			Thread.sleep(10);
 			InputStream stdout = new StreamGobbler(sess.getStdout());
-			BufferedReader br = new BufferedReader(
-					new InputStreamReader(stdout));
+			BufferedReader br = new BufferedReader(new InputStreamReader(stdout));
 			// output.append("Remote execution of "+usercommand+" returned:<br>");
 			while (true) {
 				String line = br.readLine();
 				if (line == null)
 					break;
 				if (filter.equals("")) {
-					output.append(line + "<br>");
+					output.append(line).append("<br>");
 				} else {
 					if (line.startsWith(filter)) {
-						output.append(line + "<br>");
+						output.append(line).append("<br>");
 					}
 				}
 			}
