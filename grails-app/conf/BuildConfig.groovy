@@ -12,6 +12,7 @@ grails.project.dependency.resolution = {
 	}
 
 	dependencies {
+		compile 'ch.ethz.ganymed:ganymed-ssh2:build210'
 	}
 
 	plugins {
