@@ -1,0 +1,22 @@
+<plugin name='remote-ssh' version='0.1' grailsVersion='2.2 &gt; *'>
+  <author>Vahid Hedayati</author>
+  <authorEmail>badvad@gmail.com</authorEmail>
+  <title>Remote SSH Plugin</title>
+  <description>This plugin uses ganymed-ssh-build210.jar, provides RemoteSSH RemoteSCP RemoteSCPDir RemoteSCPGet
+Each one reads in SSHController within the plugin which looks for conf/SSHConfig.groovy in your project:
+       
+</description>
+  <documentation>http://grails.org/plugin/remote-ssh</documentation>
+  <type>RemoteSSHGrailsPlugin</type>
+  <resources>
+    <resource>remotessh.SSHController</resource>
+  </resources>
+  <repositories>
+    <repository name='grailsCentral' url='http://grails.org/plugins' />
+    <repository name='mavenCentral' url='http://repo1.maven.org/maven2/' />
+  </repositories>
+  <dependencies />
+  <plugins />
+  <runtimePluginRequirements />
+  <behavior />
+</plugin>
