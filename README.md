@@ -1,10 +1,18 @@
 RemoteSSH
 =========
 
-Grails RemoteSSH Plugin based on Ganeymed-ssh2-build-210 : Provides ( RemoteSSH + exec command ) (RemoteSCP) (RemoteSCPDir) (RemoteSCPGet)
+Grails RemoteSSH Plugin based on Ganymed SSH-2 library : Provides ( RemoteSSH + exec command ) (RemoteSCP) (RemoteSCPDir) (RemoteSCPGet)
 
 
-This plugin uses the Ganymed SSH-2 library, provides RemoteSSH RemoteSCP RemoteSCPDir RemoteSCPGet
+A lot of changes made by and thanks to: burtbeckwith
+
+      changed to use a Spring bean that reads configuration values from Config.groovy instead. 
+      This is also more flexible because you can take advantage of environment support, externalized configuration, etc. 
+      The one usage change is that you need to dependency-inject the "sshConfig" bean in your controller/service/etc and passthat to the Result method
+      optional rewrite from Java to Groovy. I removed the constructors since in Groovy it's easier to use the Map constructor, and it has the benefit of being more readable, e.g. new RemoteSSH(host: '10.10.10.1', user: 'myuser', usercommand: 'uname -a', port: port)
+
+
+
 Configure SSH and SCP by adding properties to grails-app/conf/Config.groovy under the "remotessh" key:
 
 
@@ -57,37 +65,40 @@ Configure SSH and SCP by adding properties to grails-app/conf/Config.groovy unde
 
 
 
+RemoteSSH call:
+
+           RemoteSSH ash=new RemoteSSH('hostname_to_connect_to','username_to_user_optional', 
+           				'password_for_defined_user_optional','sudo_optional', 
+	   				'command to run','filter_for_optional',port)
+	   	The above is the full construct and options
+	   	optional means empty '' fields can be provided
+	   	in the case of sudo_optional change this to 'sudo' and it will exec command as sudo, 
+	   	so long as user can sudo without passwords etc on remote host
+
+	   
+	   
+	   
 
 
 
-Here are a list of all the different uses:
+Controller containing all of this plugin uses:
 
     import ssh.RemoteSCP
     import ssh.RemoteSCPDir
     import ssh.RemoteSCPGet
     import ssh.RemoteSSH
+    
+    
     class TestController {
        def sshConfig
+       int port=22
+       
+
+Action called sshexec:
+
        def sshexec() {
-        // RemoteSSH as1h=new RemoteSSH(host, user, sudo, usercommand)
-	 int port=22
+       
 
-        //RemoteSSH ash=new RemoteSSH('10.10.10.1', 'myuser', '', 'uname -a','',port)
-        //  def result=ash.Result(sshConfig)
-
-	   /* RemoteSSH ash=new RemoteSSH('hostname_to_connect_to', 
-	                                  'username_to_user_optional', 
-	                                  'password_for_defined_user_optional',
-	   								  'sudo_optional', 
-	   							      'command to run',
-	   							      'filter_for_optional',
-	   							       port
-	   							     )
-	   	The above is the full construct and options
-	   	optional means empty '' fields can be provided
-	   	in the case of sudo_optional change this to 'sudo' and it will exec command as sudo, 
-	   	so long as user can sudo without passwords etc on remote host
-	   */
 	   
 	   
 	   // This will run uptime without sudo or any filters
@@ -110,9 +121,11 @@ Here are a list of all the different uses:
 	 //returns as expected too long to display
 	 
 	}
-	
+
+
+Action called scp:
+
 	def scp() {  
-	 int port=22
 	 RemoteSCP scp1=new RemoteSCP('localhost', 'myusername', 'mypassword', '/tmp/11.txt' ,'/var/tmp', port)
 	 def result=scp1.Result(sshConfig)
 
@@ -121,9 +134,11 @@ Here are a list of all the different uses:
 	 // returns
 	 // SCP file example:File /tmp/11.txt should now be copied to localhost:/var/tmp
 	   }
-	
+
+
+Action called scpdir:
+
 	def scpdir() {
-		int port=22
 		// Bug noticed since it copied abc content into abc1 folder and the abc1 folder had to exist
 		// In short strips first folder will look at this
 		RemoteSCPDir scpdir1=new RemoteSCPDir('localhost', 'myusername', 'mypassword', '/tmp/abc' ,'/var/tmp/abc1', port)
@@ -134,9 +149,10 @@ Here are a list of all the different uses:
 		// Returns:
 		//SCP Directory example:/tmp/abc should now be copied to localhost:/var/tmp/abc1
 		  }
+		  
+Action called scpget:
 	
 	def scpget() {
-		int port=22
 		// This will get a remote file and store it in given local path
 		RemoteSCPGet scpget1=new RemoteSCPGet('localhost', 'myusername', 'mypassword', '/var/tmp/get1.txt' ,'/tmp', port)
 		def result=scpget1.Result(sshConfig)
