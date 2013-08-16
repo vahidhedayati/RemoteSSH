@@ -1,12 +1,13 @@
 package ssh;
 
+import grails.plugin.remotessh.SshConfig;
+
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 
-import remotessh.SSHController;
 import ch.ethz.ssh2.Connection;
 import ch.ethz.ssh2.Session;
 import ch.ethz.ssh2.StreamGobbler;
@@ -71,9 +72,9 @@ public class RemoteSSH  {
 	}
 
 	public String Result() throws InterruptedException {
-		// Call SSHController and get values from SSHConfig.groovy held in conf folder of your APP!
+		// Call SshConfig and get values from SSHConfig.groovy held in conf folder of your APP!
 		// This returns ssh.USER KEY KEYPASS AND PORT TO THIS java class
-		SSHController ac=new SSHController();
+		SshConfig ac=new SshConfig();
 		Object sshuser=ac.getConfig("ssh.USER");
 		Object sshpass=ac.getConfig("ssh.PASS");
 		Object sshkey=ac.getConfig("ssh.KEY");

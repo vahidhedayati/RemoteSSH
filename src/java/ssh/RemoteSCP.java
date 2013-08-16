@@ -1,9 +1,10 @@
 package ssh;
 
+import grails.plugin.remotessh.SshConfig;
+
 import java.io.File;
 import java.io.IOException;
 
-import remotessh.SSHController;
 import ch.ethz.ssh2.Connection;
 import ch.ethz.ssh2.SCPClient;
 
@@ -62,7 +63,7 @@ public class RemoteSCP {
 	}
 
 	public String Result() {
-		SSHController ac=new SSHController();
+		SshConfig ac=new SshConfig();
 		Object sshuser=ac.getConfig("ssh.USER");
 		Object sshpass=ac.getConfig("ssh.PASS");
 		Object sshkey=ac.getConfig("ssh.KEY");
