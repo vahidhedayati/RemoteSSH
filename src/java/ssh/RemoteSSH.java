@@ -71,15 +71,12 @@ public class RemoteSSH  {
 		this.port=port;
 	}
 
-	public String Result() throws InterruptedException {
-		// Call SshConfig and get values from SSHConfig.groovy held in conf folder of your APP!
-		// This returns ssh.USER KEY KEYPASS AND PORT TO THIS java class
-		SshConfig ac=new SshConfig();
-		Object sshuser=ac.getConfig("ssh.USER");
-		Object sshpass=ac.getConfig("ssh.PASS");
-		Object sshkey=ac.getConfig("ssh.KEY");
-		Object sshkeypass=ac.getConfig("ssh.KEYPASS");
-		Object sshport=ac.getConfig("ssh.PORT");
+	public String Result(SshConfig ac) throws InterruptedException {
+		Object sshuser=ac.getConfig("USER");
+		Object sshpass=ac.getConfig("PASS");
+		Object sshkey=ac.getConfig("KEY");
+		Object sshkeypass=ac.getConfig("KEYPASS");
+		Object sshport=ac.getConfig("PORT");
 		//System.out.println("----"+sshuser.toString());
 		if (user.equals("")) {
 			user = sshuser.toString();
@@ -136,10 +133,10 @@ public class RemoteSSH  {
 				if (line == null)
 					break;
 				if (filter.equals("")) {
-					output.append(line + "<br>");
+					output.append(line).append("<br>");
 				} else {
 					if (line.startsWith(filter)) {
-						output.append(line + "<br>");
+						output.append(line).append("<br>");
 					}
 				}
 			}

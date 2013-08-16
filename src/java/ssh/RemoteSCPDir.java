@@ -64,14 +64,12 @@ public class RemoteSCPDir  {
 		this.port=port;
 	}
 
-	public String Result() {
-
-		SshConfig ac=new SshConfig();
-		Object sshuser=ac.getConfig("ssh.USER");
-		Object sshpass=ac.getConfig("ssh.PASS");
-		Object sshkey=ac.getConfig("ssh.KEY");
-		Object sshkeypass=ac.getConfig("ssh.KEYPASS");
-		Object sshport=ac.getConfig("ssh.PORT");
+	public String Result(SshConfig ac) {
+		Object sshuser=ac.getConfig("USER");
+		Object sshpass=ac.getConfig("PASS");
+		Object sshkey=ac.getConfig("KEY");
+		Object sshkeypass=ac.getConfig("KEYPASS");
+		Object sshport=ac.getConfig("PORT");
 		//System.out.println("----"+sshuser.toString());
 		if (user.equals("")) {
 			user = sshuser.toString();

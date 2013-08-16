@@ -1,3 +1,5 @@
+import grails.plugin.remotessh.SshConfig
+
 class RemoteSshGrailsPlugin {
 	def version = "0.1"
 	def grailsVersion = "2.0 > *"
@@ -9,4 +11,10 @@ class RemoteSshGrailsPlugin {
 	def license = "GPL2"
 	def issueManagement = [system: 'GITHUB', url: 'https://github.com/vahidhedayati/RemoteSSH/issues']
 	def scm = [url: 'https://github.com/vahidhedayati/RemoteSSH']
+
+	def doWithSpring = {
+		sshConfig(SshConfig) {
+			grailsApplication = ref('grailsApplication')
+		}
+	}
 }
