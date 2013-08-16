@@ -80,13 +80,14 @@ RemoteSSH call:
 	   
 # RemoteSSH Variations in how it is called
 
-    RemoteSSH rsh=RemoteSSH(String host, String usercommand)
-    RemoteSSH rsh=new RemoteSSH(String host, String sudo, String usercommand) 
-    RemoteSSH rsh=new RemoteSSH(String host, String user, String sudo, String usercommand) 
-    RemoteSSH rsh=new RemoteSSH(String host, String user, String sudo, String usercommand,String filter) 
-    RemoteSSH rsh=new RemoteSSH(String host, String user, String sudo, String usercommand, Integer port) 
-    RemoteSSH rsh=new RemoteSSH(String host, String user, String sudo, String usercommand,String filter, Integer port) 
-    RemoteSSH rsh=new RemoteSSH(String host, String user, String userpass, String sudo, String usercommand,String filter,Integer port) 
+    RemoteSSH rsh=RemoteSSH(host,usercommand)
+    RemoteSSH rsh=new RemoteSSH(host, sudo, usercommand) 
+    RemoteSSH rsh=new RemoteSSH(host, user, sudo, usercommand) 
+    RemoteSSH rsh=new RemoteSSH(host, user, sudo, usercommand,filter) 
+    RemoteSSH rsh=new RemoteSSH(host, user, sudo, usercommand, port) 
+    RemoteSSH rsh=new RemoteSSH(host, user, sudo, usercommand,filter, port) 
+    RemoteSSH rsh=new RemoteSSH(host, user, userpass, sudo, usercommand,filter,port) 
+
 
 
 # RemoteSSH With some more examples of above calls:
@@ -102,32 +103,32 @@ RemoteSSH call:
          
 # RemoteSCP Call types:
 
-     RemoteSCP rscp=new RemoteSCP(String host, String file, String remotedir) 
-     RemoteSCP rscp=new RemoteSCP(String host, String user, String file, String remotedir) 
-     RemoteSCP rscp=new RemoteSCP(String host, String user, String userpass, String file, String remotedir) 
-     RemoteSCP rscp=new RemoteSCP(String host, String file, String remotedir, Integer port) 
-     RemoteSCP rscp=new RemoteSCP(String host, String user, String file, String remotedir, Integer port) 
-     RemoteSCP rscp=new RemoteSCP(String host, String user, String userpass, String file, String remotedir, Integer port) 
+     RemoteSCP rscp=new RemoteSCP(host, file, remotedir) 
+     RemoteSCP rscp=new RemoteSCP(host, user, file, remotedir) 
+     RemoteSCP rscp=new RemoteSCP(host, user, userpass, file, remotedir) 
+     RemoteSCP rscp=new RemoteSCP(host, file, remotedir, port) 
+     RemoteSCP rscp=new RemoteSCP(host, user, file, remotedir, port) 
+     RemoteSCP rscp=new RemoteSCP(host, user, userpass, file, remotedir, port) 
 
 
 # RemoteSCPDir call types:
 
-    RemoteSCPDir rscpdir=new RemoteSCPDir(String hostname, String localdir,String remotedir) 
-    RemoteSCPDir rscpdir=new RemoteSCPDir(String hostname, String user, String localdir,String remotedir) 
-    RemoteSCPDir rscpdir=new RemoteSCPDir(String hostname, String user,String userpass, String localdir,String remotedir) 
-    RemoteSCPDir rscpdir=new RemoteSCPDir(String hostname, String localdir,String remotedir, Integer port) 
-    RemoteSCPDir rscpdir=new RemoteSCPDir(String hostname, String user, String localdir,String remotedir, Integer port) 
-    RemoteSCPDir rscpdir=new RemoteSCPDir(String hostname, String user, String userpass, String localdir,String remotedir, Integer port) 
+    RemoteSCPDir rscpdir=new RemoteSCPDir(hostname, localdir,remotedir) 
+    RemoteSCPDir rscpdir=new RemoteSCPDir(hostname, user, localdir,remotedir) 
+    RemoteSCPDir rscpdir=new RemoteSCPDir(hostname, user,userpass, localdir,remotedir) 
+    RemoteSCPDir rscpdir=new RemoteSCPDir(hostname, localdir,remotedir, port) 
+    RemoteSCPDir rscpdir=new RemoteSCPDir(hostname, user, localdir,remotedir, port) 
+    RemoteSCPDir rscpdir=new RemoteSCPDir(hostname, user, userpass, localdir,remotedir, port) 
 
 
 # RemoteSCPGet call types:
 
-    RemoteSCPGet rscpdir=new RemoteSCPGet(String host, String file, String localdir) 
-    RemoteSCPGet rscpdir=new RemoteSCPGet(String host, String user, String file, String localdir) 
-    RemoteSCPGet rscpdir=new RemoteSCPGet(String host, String user, String userpass, String file, String localdir) 
-    RemoteSCPGet rscpdir=new RemoteSCPGet(String host, String file, String localdir,Integer port) 
-    RemoteSCPGet rscpdir=new RemoteSCPGet(String host, String user, String file, String localdir,Integer port) 
-    RemoteSCPGet rscpdir=new RemoteSCPGet(String host, String user, String userpass, String file, String localdir,Integer port) 
+    RemoteSCPGet rscpdir=new RemoteSCPGet(host, file, localdir) 
+    RemoteSCPGet rscpdir=new RemoteSCPGet(host, user, file, localdir) 
+    RemoteSCPGet rscpdir=new RemoteSCPGet(host, user, userpass, file, localdir) 
+    RemoteSCPGet rscpdir=new RemoteSCPGet(host, file, localdir,port) 
+    RemoteSCPGet rscpdir=new RemoteSCPGet(host, user, file, localdir,port) 
+    RemoteSCPGet rscpdir=new RemoteSCPGet(host, user, userpass, file, localdir,port) 
 
   
 
