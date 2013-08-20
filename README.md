@@ -238,8 +238,8 @@ View/GSp:
                 
                 
 TagLib:
-               package test1
 
+               package test1
                class ConnectTagLib {
               	static namespace = "connectit"
               	def connectService
@@ -253,13 +253,14 @@ TagLib:
               }
               
 Service:
-            package test1
-            import grails.plugin.remotessh.SshConfig
-            import ssh.RemoteSSH
-            class ConnectService {
-              def getResult(String command, SshConfig sshConfig) {	  
-	       RemoteSSH rsh=new RemoteSSH('ip', 'user','', '', command,'',0)
-	       return rsh.Result(sshConfig)
-              }  
+
+              package test1
+              import grails.plugin.remotessh.SshConfig
+              import ssh.RemoteSSH
+              class ConnectService {
+                def getResult(String command, SshConfig sshConfig) {	  
+                  RemoteSSH rsh=new RemoteSSH('ip', 'user','', '', command,'',0)
+                  return rsh.Result(sshConfig)
+                }  
             }
             
