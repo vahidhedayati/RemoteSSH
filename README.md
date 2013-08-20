@@ -219,7 +219,7 @@ Action called scpget:
     }
 
 
-How to do a service
+## How to run it from a service 
 
 1. By passing sshConfig from controller to gsp from gsp to taglib -> service:
 
