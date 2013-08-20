@@ -218,3 +218,48 @@ Action called scpget:
 	
     }
 
+
+How to do a service
+
+1. By passing sshConfig from controller to gsp from gsp to taglib -> service:
+
+Controller:
+
+        class TestController {
+         	def sshConfig
+         	def get1() {
+         		render(view: "index1", model: [sshConfig:sshConfig])
+         	}
+
+
+View/GSp:
+
+                <connectit:getResult command="ls -l" sshConfig="${sshConfig }" />
+                
+                
+TagLib:
+               package test1
+
+               class ConnectTagLib {
+              	static namespace = "connectit"
+              	def connectService
+              	def getResult=  { attrs, body ->
+              	def command= attrs.remove('command')?.toString()
+              	def sshConfig =attrs.remove('sshConfig')
+              	if(command) {
+              		def result = connectService.getResult(command,sshConfig)
+              		out << "${result}"
+              	}	
+              }
+              
+Service:
+            package test1
+            import grails.plugin.remotessh.SshConfig
+            import ssh.RemoteSSH
+            class ConnectService {
+              def getResult(String command, SshConfig sshConfig) {	  
+	       RemoteSSH rsh=new RemoteSSH('ip', 'user','', '', command,'',0)
+	       return rsh.Result(sshConfig)
+              }  
+            }
+            
