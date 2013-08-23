@@ -223,54 +223,60 @@ Action called scpget:
 
 # 1. Dependancy injection with examples for RemoteSSH (groovy) and RemoteSSH (Java)
 
-1.1 Service
+1.1 Service for Java Construct call :
 
-       import grails.plugin.remotessh.SshConfig
-       import org.springframework.beans.factory.InitializingBean
-       import org.springframework.context.ApplicationContext
-       import ssh.RemoteSSH
+This will send a command through connect to given ip and username. Passsword is blank and so is sudo and lastly filter
 
 
-       class ConnectService implements InitializingBean {
-        def grailsApplication
-        def setting
-        // Void set not used in order to implement initialing bean
-        void afterPropertiesSet() { setting = grailsApplication.config.setting }
-        SshConfig sshConfig=new SshConfig()
-        
-        def getResult(String command) {
-        
-        
-        	// Getting objects back by interacting with grailsApplication context 
-        	// Not required just an example and using its port to put back in as an EXAMPLE to override its own port
-        	ApplicationContext ctx = (ApplicationContext) org.codehaus.groovy.grails.web.context.ServletContextHolder.getServletContext().getAttribute(org.codehaus.groovy.grails.web.servlet.GrailsApplicationAttributes.APPLICATION_CONTEXT);
-        	def grailsApp = ctx.getBean("grailsApplication")
-        	println grailsApp.config.remotessh
-        	
-        	
-        	// Direct interaction with controller - again not used something I been messing with
-        	//def controllerName = ctx.getBean("grailsUrlMappingsHolder").match(request.getServletPath()).getParameters().controller
-                //def controllerInstance = grailsApp.getArtefactByLogicalPropertyName("Controller", TestController)
-                
-                // BELOW IS Groovy call - the import line needs to replace the ssh.RemoteSSH call at the top of this service
-                // import grails.plugin.remotessh.RemoteSSH
-                //RemoteSSH rsh=new RemoteSSH()
-                //rsh.setHost('xx.xx.xx.xx')
-                //rsh.setPort(Integer.parseInt(grailsApp.config.remotessh.PORT))
-                //rsh.setUser('my_username')
-                //rsh.setUsercommand('whoami')
-                //def g=rsh.Result(sshConfig)
-                //------------------------------------------------------------------
-                
-                // Above example did work and the sshConfig key pass did an override, connected and returned whoami result from remote host
-                
-                //------------------------------------------------------------------
-                // Below example is using a Java construct and requires ssh.RemoteSSH import above 
-                RemoteSSH rsh=new RemoteSSH('xx.xx.xx.xx', 'my_username','', '', command,'',0)
-                def g= rsh.Result(sshConfig)
-                return g
-               }
-              }
+	package test1
+
+	import grails.plugin.remotessh.SshConfig
+	import ssh.RemoteSSH
+
+	class ConnectService {
+
+   		def grailsApplication
+   		SshConfig sshConfig=new SshConfig()
+   	
+   		def getResult(String command) {	  
+	   		RemoteSSH rsh=new RemoteSSH('XX.XX.XX.XX', 'myuser','', '', command,'',0)
+	   		def g= rsh.Result(sshConfig)
+	   		return g
+   		}
+
+	}
+
+
+
+1.2 Service for Groovy call of RemoteSSH
+
+
+	package test1
+
+	import grails.plugin.remotessh.RemoteSSH
+	import grails.plugin.remotessh.SshConfig
+
+	class ConnectService {
+
+   		def grailsApplication
+   		SshConfig sshConfig=new SshConfig()
+   		
+   		def getResult(String command) {	  
+	
+	   		RemoteSSH rsh=new RemoteSSH()
+	   		rsh.setHost('XX.XX.XX.XX')
+	   		rsh.setPort(0)
+	   		rsh.setUser('myuser')
+	   		rsh.setUsercommand('whoami')
+	   		def g=rsh.Result(sshConfig)
+	   		return g
+   		}
+
+	}
+
+
+
+
 
 
 1.2 Taglib
@@ -297,7 +303,10 @@ Action called scpget:
 1.5 Controller:
 
 
-	def get1() {render(view: "index1", model: []) }
+	def get1= {
+		render (view : 'index1', model : [:]) 
+	}
+
 
 
 
