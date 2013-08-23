@@ -170,11 +170,34 @@ This will send a command through connect to given ip and username. Passsword is 
 
 
 
+# 2. Shell script example:
+I am about to pgrep mysqld then for the pid split out all of its running config then parse for datadir|socket|default-file and return the pid with those values starting with __:, all on one line.
 
+	 
+	 mysqlpid=$(pgrep mysqld);for mid in $mysqlpid; do echo -n "__:$mid config is ";   cfg1=$(ps wp $mid|grep $mid|sed -e 's/ \-/\n\-/g'|grep '^-'|egrep "datadir|socket|default-file"|tr  "\n\r" " "); echo  "$cfg1"; done
+
+The above works fine on local terminal, and when if you do decide to create like example given at the very bottom to have a domainclass manage scripts, you should be able to put above into the shell script textarea of your domainclass --> scriptContent. 
+
+
+But in order to make it work via the service as is, additional \backslashes have to be added:
+
+	 
+	 
+	 String testscript2='mid=$(pgrep mysql);for mpid in $mid; do echo -n \"__:$mpid config is \";   mdet=$(ps wp $mpid|grep $mpid|sed -e \'s/ \\-/\\n\\-/g\'|grep \'^-\'|egrep \"datadir|socket|default-file\"|tr  \"\\n\\r\" \" \"); echo  \"$mdet\"; done'
+	   
+	  RemoteSSH rsh=new RemoteSSH('IP', 'USER','', '', testscript2,'__:',0)
+	  def g= rsh.Result(sshConfig)
+	  return g
+
+With that in place it should connect to remote host run that script and look out for __: displaying this back to the screen
+
+
+
+## Java Constructs:
 
 
 	   
-# RemoteSSH Construct Variations:
+# RemoteSSH  Variations:
 
     RemoteSSH rsh=RemoteSSH(host,usercommand)
     RemoteSSH rsh=new RemoteSSH(host, sudo, usercommand) 
