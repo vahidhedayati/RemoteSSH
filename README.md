@@ -362,4 +362,4 @@ The scripts are then dynamically listed as options and a next user can select to
 
 
 
-And now finally a big thank you to Burt Beckwith for all his input and making this a lot more flexible than was originally written.
+And now finally a big thank you to Burt Beckwith for adding so much flexibility to the global configuration and additional groovy calls. 
