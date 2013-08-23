@@ -293,6 +293,8 @@ Action called scpdir:
 
 	def scpdir() {
 Warning this strips remote folder so on local host the files ended up in /tmp/abc and not /tmp/abc/abc1
+
+
 		RemoteSCPDir scpdir1=new RemoteSCPDir('localhost', 'myusername', 'mypassword', '/tmp/abc' ,'/var/tmp/abc1', port)
 		def result=scpdir1.Result(sshConfig)
    
@@ -305,6 +307,8 @@ Action called scpget:
 	
 	def scpget() {
 This will get a remote file and store it in given local path
+
+
 		RemoteSCPGet scpget1=new RemoteSCPGet('localhost', 'myusername', 'mypassword', '/var/tmp/get1.txt' ,'/tmp', port)
 		def result=scpget1.Result(sshConfig)
    
