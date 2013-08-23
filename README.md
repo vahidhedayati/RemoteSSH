@@ -255,7 +255,7 @@ If I had defined the same user in my global config and the correct port etc then
   
 
 
-## Controller containing all of this plugin in use:
+## Example Controller: Making use of all of the above Java calls :
 
     import ssh.RemoteSCP
     import ssh.RemoteSCPDir
@@ -343,59 +343,7 @@ This will get a remote file and store it in given local path
    }
 
 
-
-
-
-# Wrong way of doing a service:
-
-Not really the correct way of doing things, this is the lengthy way of doing things by passing sshConfig from controller to gsp then from gsp to taglib and from taglib to service:
-
-Controller:
-
-        class TestController {
-         	def sshConfig
-         	def get1() {
-         		render(view: "index1", model: [sshConfig:sshConfig])
-         	}
-
-
-View/GSp:
-
-                <connectit:getResult command="ls -l" sshConfig="${sshConfig }" />
-                
-                
-TagLib:
-
-               package test1
-               class ConnectTagLib {
-              	static namespace = "connectit"
-              	def connectService
-              	def getResult=  { attrs, body ->
-              	def command= attrs.remove('command')?.toString()
-              	def sshConfig =attrs.remove('sshConfig')
-              	if(command) {
-              		def result = connectService.getResult(command,sshConfig)
-              		out << "${result}"
-              	}	
-              }
-              
-Service:
-
-              package test1
-              import grails.plugin.remotessh.SshConfig
-              import ssh.RemoteSSH
-              class ConnectService {
-                def getResult(String command, SshConfig sshConfig) {	  
-                  RemoteSSH rsh=new RemoteSSH('ip', 'user','', '', command,'',0)
-                  return rsh.Result(sshConfig)
-                }  
-            }
-            
-            
-            
-
-And now finally a big thank you to Burt Beckwith for all his input and making this a lot more flexible than was originally written.
-
+## ShellScript Wrapper
 I have written a wrapper for this using 
 
 	String scriptName 
@@ -410,3 +358,8 @@ I have written a wrapper for this using
 The scripts are then dynamically listed as options and a next user can select to run them on the given remote host...
 
 
+
+
+
+
+And now finally a big thank you to Burt Beckwith for all his input and making this a lot more flexible than was originally written.
