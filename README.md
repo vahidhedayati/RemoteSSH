@@ -368,3 +368,22 @@ Service:
                 }  
             }
             
+            
+            
+
+And now finally a big thank you to Burt Beckwith for all his input and making this a lot more flexible than was originally written.
+
+I have written a wrapper for this using 
+
+	String scriptName 
+	String scriptContent
+	// This being hidden field for user logged in who added the script
+	String addedby
+	Boolean sudo
+
+	static mapping = { scriptContent type: "text" } }
+
+
+The scripts are then dynamically listed as options and a next user can select to run them on the given remote host...
+
+
