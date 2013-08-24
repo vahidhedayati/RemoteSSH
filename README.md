@@ -4,6 +4,13 @@ RemoteSSH
 Grails RemoteSSH Plugin based on Ganymed SSH-2 library : Provides ( RemoteSSH + exec command ) (RemoteSCP) (RemoteSCPDir) (RemoteSCPGet)
 
 
+Dependency :
+
+
+	compile ":remote-ssh:0.1" 
+	
+	
+
 A lot of changes made by and thanks to: burtbeckwith
 
       changed to use a Spring bean that reads configuration values from Config.groovy instead. 
