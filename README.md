@@ -90,12 +90,12 @@ This will send a command through connect to given ip and username. Passsword is 
 	package test1
 
 	import grails.plugin.remotessh.SshConfig
-	import ssh.RemoteSSH
+
 
 	class ConnectService {
 
    		def grailsApplication
-   		SshConfig sshConfig=new SshConfig()
+   		def sshConfig
    	
    		def getResult(String command) {	  
 	   		RemoteSSH rsh=new RemoteSSH('XX.XX.XX.XX', 'myuser','', '', command,'',0)
@@ -113,12 +113,12 @@ This will send a command through connect to given ip and username. Passsword is 
 	package test1
 
 	import grails.plugin.remotessh.RemoteSSH
-	import grails.plugin.remotessh.SshConfig
+
 
 	class ConnectService {
 
    		def grailsApplication
-   		SshConfig sshConfig=new SshConfig()
+   		def sshConfig
    		
    		def getResult(String command) {	  
 	
