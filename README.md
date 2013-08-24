@@ -192,7 +192,11 @@ But in order to make it work via the service as is, additional \backslashes have
 With that in place it should connect to remote host run that script and look out for __: displaying this back to the screen
 
 
-2.1 Removing actual filter from the result set:
+2.1 Remove filter : basic replace, where __: was the filter:
+
+    return rsh.Result(sshConfig).toString().replace('__:', '')
+
+2.2 Removing filter and parsing lines - maybe useful if results are to be further parsed or stored in db....
 
  		RemoteSSH rsh=new RemoteSSH('IP', 'USER','', '', testscript2,'__:',0)
 		String sres=rsh.Result(sshConfig).toString()
