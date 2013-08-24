@@ -192,6 +192,34 @@ But in order to make it work via the service as is, additional \backslashes have
 With that in place it should connect to remote host run that script and look out for __: displaying this back to the screen
 
 
+2.1 Removing actual filter from the result set:
+
+ 		RemoteSSH rsh=new RemoteSSH('IP', 'USER','', '', testscript2,'__:',0)
+		String sres=rsh.Result(sshConfig).toString()
+		String seperator='__:'
+		String g=fixResult(seperator,sres)	
+		return g
+	//End getResult				
+   	}
+
+
+
+   	private String fixResult(String seperator,String sres) {
+		sres=sres.replace('<br>','\n')
+		List<String> list = Arrays.asList(sres.split("\\n"));
+		String g=""
+		list.each() {
+			if (it.indexOf(seperator)>-1) {
+				g+=it.substring(it.indexOf(seperator)+seperator.length(),it.length())+"<br>"
+			}
+		}
+		return g
+   	}
+     // End Service	
+     }
+
+
+
 
 ## Java Constructs:
 
