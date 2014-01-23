@@ -64,7 +64,7 @@ public class RemoteSCPGet  {
 		this.port=port;
 	}
 
-	public String Result(SshConfig ac) {
+	public String Result(SshConfig ac) throws IOException{
 		Object sshuser=ac.getConfig("USER");
 		Object sshpass=ac.getConfig("PASS");
 		Object sshkey=ac.getConfig("KEY");
@@ -87,7 +87,6 @@ public class RemoteSCPGet  {
 		String username = user;
 		File keyfile = new File(sshkey.toString());
 		String keyfilePass = sshkeypass.toString();
-		try {
 			if (port==0){port=22; }
 			Connection conn = new Connection(hostname,port);
 			/* Now connect */
@@ -111,9 +110,6 @@ public class RemoteSCPGet  {
 			output = "File " + file + " should now be copied from " + host
 					+ " to localdir: " + localdir + "<br>";
 
-		} catch (IOException e) {
-			output += e.toString();
-		}
 		return output;
 	}
 }

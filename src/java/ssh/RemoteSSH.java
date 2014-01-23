@@ -71,7 +71,7 @@ public class RemoteSSH  {
 		this.port=port;
 	}
 
-	public String Result(SshConfig ac) throws InterruptedException {
+	public String Result(SshConfig ac) throws InterruptedException, IOException {
 		Object sshuser=ac.getConfig("USER");
 		Object sshpass=ac.getConfig("PASS");
 		Object sshkey=ac.getConfig("KEY");
@@ -94,7 +94,6 @@ public class RemoteSSH  {
 		String username = user;
 		File keyfile = new File(sshkey.toString());
 		String keyfilePass = sshkeypass.toString();
-		try {
 			if (port==0){port=22; }
 			Connection conn = new Connection(hostname,port);
 			/* Now connect */
@@ -144,10 +143,6 @@ public class RemoteSSH  {
 			sess.close();
 			/* Close the connection */
 			conn.close();
-
-		} catch (IOException e) {
-			output.append(e);
-		}
 		return output.toString();
 	}
 }

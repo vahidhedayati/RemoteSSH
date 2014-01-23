@@ -62,7 +62,7 @@ public class RemoteSCP {
 		this.port=port;
 	}
 
-	public String Result(SshConfig ac) {
+	public String Result(SshConfig ac) throws IOException{
 		Object sshuser=ac.getConfig("USER");
 		Object sshpass=ac.getConfig("PASS");
 		Object sshkey=ac.getConfig("KEY");
@@ -85,7 +85,6 @@ public class RemoteSCP {
 		String username = user;
 		File keyfile = new File(sshkey.toString());
 		String keyfilePass = sshkeypass.toString();
-		try {
 		if (port==0){port=22; }
 			Connection conn = new Connection(hostname,port);
 			/* Now connect */
@@ -109,9 +108,6 @@ public class RemoteSCP {
 			output = "File " + file + " should now be copied to " + host + ":"
 					+ remotedir + "<br>";
 
-		} catch (IOException e) {
-			output = e.toString();
-		}
 		return output;
 	}
 }
