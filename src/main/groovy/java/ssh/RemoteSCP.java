@@ -1,4 +1,4 @@
-package ssh;
+package java.ssh;
 
 import grails.plugin.remotessh.SshConfig;
 
@@ -9,58 +9,56 @@ import ch.ethz.ssh2.Connection;
 import ch.ethz.ssh2.SCPClient;
 
 /**
- * Used by AddFTP and AddServerRemote classes This uses
- * SSHConfig Interface Gets files from remote hosts
+ * Copies a file to remote server.
  */
-public class RemoteSCPGet  {
+public class RemoteSCP {
 
 	String host = "";
 	String user = "";
 	Integer port=0;
 	String userpass="";
 	String file = "";
-	String localdir = "";
+	String remotedir = "";
 	String usercommand = "";
 	String output = "";
 
-	public RemoteSCPGet(String host, String file, String localdir) {
+	public RemoteSCP(String host, String file, String remotedir) {
 		this.host = host;
 		this.file = file;
-		this.localdir = localdir;
+		this.remotedir = remotedir;
 	}
-	public RemoteSCPGet(String host, String user, String file, String localdir) {
-		this.host = host;
-		this.user = user;
-		this.file = file;
-		this.localdir = localdir;
-	}
-	public RemoteSCPGet(String host, String user, String userpass, String file, String localdir) {
-		this.host = host;
-		this.user = user;
-		this.userpass=userpass;
-		this.file = file;
-		this.localdir = localdir;
-	}
-	public RemoteSCPGet(String host,  String file, String localdir,Integer port) {
-		this.host = host;
-		this.file = file;
-		this.localdir = localdir;
-		this.port=port;
-	}
-	public RemoteSCPGet(String host, String user, String file, String localdir,Integer port) {
+	public RemoteSCP(String host, String user, String file, String remotedir) {
 		this.host = host;
 		this.user = user;
 		this.file = file;
-		this.localdir = localdir;
-		this.port=port;
+		this.remotedir = remotedir;
 	}
-
-	public RemoteSCPGet(String host, String user,  String userpass, String file, String localdir,Integer port) {
+	public RemoteSCP(String host, String user, String userpass, String file, String remotedir) {
 		this.host = host;
 		this.user = user;
 		this.userpass=userpass;
 		this.file = file;
-		this.localdir = localdir;
+		this.remotedir = remotedir;
+	}
+	public RemoteSCP(String host, String file, String remotedir, Integer port) {
+		this.host = host;
+		this.file = file;
+		this.remotedir = remotedir;
+		this.port=port;
+	}
+	public RemoteSCP(String host, String user, String file, String remotedir, Integer port) {
+		this.host = host;
+		this.user = user;
+		this.file = file;
+		this.remotedir = remotedir;
+		this.port=port;
+	}
+	public RemoteSCP(String host, String user, String userpass,  String file, String remotedir, Integer port) {
+		this.host = host;
+		this.user = user;
+		this.userpass=userpass;
+		this.file = file;
+		this.remotedir = remotedir;
 		this.port=port;
 	}
 
@@ -87,7 +85,7 @@ public class RemoteSCPGet  {
 		String username = user;
 		File keyfile = new File(sshkey.toString());
 		String keyfilePass = sshkeypass.toString();
-			if (port==0){port=22; }
+		if (port==0){port=22; }
 			Connection conn = new Connection(hostname,port);
 			/* Now connect */
 			conn.connect();
@@ -99,16 +97,16 @@ public class RemoteSCPGet  {
 			}else{
 				isAuthenticated = conn.authenticateWithPassword(username,userpass);
 			}
-
 			if (isAuthenticated == false)
 				throw new IOException("Authentication failed.");
 
 			/* Create a session */
 			SCPClient scp = conn.createSCPClient();
-			scp.get(file, localdir);
+			scp.put(file, remotedir);
 			conn.close();
-			output = "File " + file + " should now be copied from " + host
-					+ " to localdir: " + localdir + "<br>";
+
+			output = "File " + file + " should now be copied to " + host + ":"
+					+ remotedir + "<br>";
 
 		return output;
 	}

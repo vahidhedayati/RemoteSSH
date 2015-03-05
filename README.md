@@ -4,11 +4,13 @@ RemoteSSH
 Grails RemoteSSH Plugin based on Ganymed SSH-2 library : Provides ( RemoteSSH + exec command ) (RemoteSCP) (RemoteSCPDir) (RemoteSCPGet)
 
 
-Dependency :
+Dependency Grails 2:
 
 ```groovy
-	compile ":remote-ssh:0.1" 
+	compile ":remote-ssh:0.2" 
 ```	
+
+Grails 3:  https://bintray.com/artifact/download/vahid/maven/RemoteSSH-0.3.jar
 	
 #### For websocket live ssh connection / interaction: 
 Check out : [jssh](https://github.com/vahidhedayati/jssh)

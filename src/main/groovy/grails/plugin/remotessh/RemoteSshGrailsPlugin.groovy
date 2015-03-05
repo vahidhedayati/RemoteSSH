@@ -1,14 +1,14 @@
 import grails.plugin.remotessh.SshConfig
+import grails.plugins.Plugin
 
-class RemoteSshGrailsPlugin {
-	def version = "0.2"
-	def grailsVersion = "2.0 > *"
+class RemoteSshGrailsPlugin extends Plugin {
+	def grailsVersion = "3.0 > *"
 	def title = "Remote SSH Plugin"
 	def author = "Vahid Hedayati"
 	def authorEmail = "badvad@gmail.com"
 	def description = 'Uses the Ganymed SSH-2 library to provide RemoteSSH, RemoteSCP, RemoteSCPDir, and RemoteSCPGet'
 	def documentation = "http://grails.org/plugin/remote-ssh"
-	def license = "GPL2"
+	def license = "Apache-2.0"
 	def issueManagement = [system: 'GITHUB', url: 'https://github.com/vahidhedayati/RemoteSSH/issues']
 	def scm = [url: 'https://github.com/vahidhedayati/RemoteSSH']
 

@@ -1,4 +1,4 @@
-package ssh;
+package java.ssh;
 
 import grails.plugin.remotessh.SshConfig;
 
