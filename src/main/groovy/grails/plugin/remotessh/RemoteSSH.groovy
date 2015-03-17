@@ -16,12 +16,13 @@ class RemoteSSH  {
 	StringBuilder output = new StringBuilder()
 
 	String Result(SshConfig ac) throws InterruptedException {
-		Object sshuser=ac.getConfig("USER")
-		Object sshpass=ac.getConfig("PASS")
-		Object sshkey=ac.getConfig("KEY")
-		Object sshkeypass=ac.getConfig("KEYPASS")
-		Object sshport=ac.getConfig("PORT")
-		//println "----$sshuser"
+		Object sshuser=ac?.getConfig("USER")
+		Object sshpass=ac?.getConfig("PASS")
+		Object sshkey=ac?.getConfig("KEY")
+		
+		Object sshkeypass=ac?.getConfig("KEYPASS")
+		Object sshport=ac?.getConfig("PORT")
+	println "----$sshuser ::: $sshkey"
 		Integer scpPort = port
 		if (!scpPort) {
 			String sps=sshport.toString()
