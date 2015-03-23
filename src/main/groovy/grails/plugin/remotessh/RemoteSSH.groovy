@@ -4,36 +4,41 @@ import ch.ethz.ssh2.Connection
 import ch.ethz.ssh2.Session
 import ch.ethz.ssh2.StreamGobbler
 
-class RemoteSSH  {
-	String host = ""
-	String user = ""
-	String sudo = ""
+class RemoteSSH {
+
+    String host = ''
+	String user = ''
+	String sudo = ''
 	Integer port=0
-	String userpass=""
-	String usercommand = ""
-	String filter = ""
+	String userpass = ''
+	String usercommand = ''
+	String filter = ''
 
 	StringBuilder output = new StringBuilder()
 
-	String Result(SshConfig ac) throws InterruptedException {
-		Object sshuser=ac?.getConfig("USER")
-		Object sshpass=ac?.getConfig("PASS")
-		Object sshkey=ac?.getConfig("KEY")
-		
-		Object sshkeypass=ac?.getConfig("KEYPASS")
-		Object sshport=ac?.getConfig("PORT")
-	println "----$sshuser ::: $sshkey"
+	String Result(ConfigObject ac) throws InterruptedException {
+
+		Object sshuser = ac?.USER ?: ''
+		Object sshpass = ac?.PASS ?: ''
+		Object sshkey = ac?.KEY ?: ''
+		Object sshkeypass = ac?.KEYPASS ?: ''
+		Object sshport = ac?.PORT
+
 		Integer scpPort = port
+
 		if (!scpPort) {
 			String sps=sshport.toString()
 			if (sps.matches("[0-9]+")) {
 				scpPort=Integer.parseInt(sps)
 			}
 		}
+
 		String username = user ?: sshuser.toString()
 		String password = userpass ?: sshpass.toString()
+
 		File keyfile = new File(sshkey.toString())
 		String keyfilePass = sshkeypass.toString()
+
 		try {
 			Connection conn = new Connection(host,scpPort ?: 22)
 			/* Now connect */
@@ -54,7 +59,7 @@ class RemoteSSH  {
 			Session sess = conn.openSession()
 			sess.requestPTY("vt220")
 			if (sudo == "sudo") {
-				sess.execCommand("sudo bash")
+				sess.execCommand("sudo -i")
 				// sess.execCommand("sudo bash")
 			} else {
 				sess.execCommand("/bin/bash")
@@ -66,7 +71,6 @@ class RemoteSSH  {
 			sleep(10)
 			InputStream stdout = new StreamGobbler(sess.getStdout())
 			BufferedReader br = new BufferedReader(new InputStreamReader(stdout))
-			// output.append("Remote execution of $usercommand returned:<br>")
 			while (true) {
 				String line = br.readLine()
 				if (line == null)

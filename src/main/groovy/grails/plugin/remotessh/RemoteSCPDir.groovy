@@ -10,22 +10,25 @@ import ch.ethz.ssh2.Session
  */
 class RemoteSCPDir  {
 
-	String hostname = ""
-	String user = ""
-	Integer port=0
-	String userpass=""
-	String localdir = ""
-	String remotedir = ""
-	String output = ""
+    String host = ''
+    String user = ''
+    String sudo = ''
+    Integer port = 0
+    String userpass = ''
+    String usercommand = ''
+    String localdir = ''
+    String remotedir = ''
+    StringBuilder output = new StringBuilder()
 
-	String Result(SshConfig ac) {
-		Object sshuser=ac.getConfig("USER")
-		Object sshpass=ac.getConfig("PASS")
-		Object sshkey=ac.getConfig("KEY")
-		Object sshkeypass=ac.getConfig("KEYPASS")
-		Object sshport=ac.getConfig("PORT")
-		//println "----$sshuser"
-		Integer scpPort = port
+    String Result(ConfigObject ac) throws InterruptedException {
+
+        Object sshuser = ac?.USER ?: ''
+        Object sshpass = ac?.PASS ?: ''
+        Object sshkey = ac?.KEY ?: ''
+        Object sshkeypass = ac?.KEYPASS ?: ''
+        Object sshport = ac?.PORT
+
+    	Integer scpPort = port
 		if (!scpPort) {
 			String sps=sshport.toString()
 			if (sps.matches("[0-9]+")) {
@@ -50,8 +53,7 @@ class RemoteSCPDir  {
 			}
 			if (!isAuthenticated)
 				throw new IOException("Authentication failed.")
-			// Session sess = conn.openSession()
-			// sess.execCommand("mkdir -p $remotedir")
+
 			putDir(conn, localdir, remotedir, "0600")
 			conn.close()
 			output = "$localdir should now be copied to $hostname:$remotedir<br>"

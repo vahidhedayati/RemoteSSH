@@ -9,21 +9,22 @@ import ch.ethz.ssh2.SCPClient
  */
 class RemoteSCPGet  {
 
-	String host = ""
-	String user = ""
-	Integer port=0
-	String userpass=""
-	String file = ""
-	String localdir = ""
-	String output = ""
+	String host = ''
+	String user = ''
+	Integer port = 0
+	String userpass = ''
+	String file = ''
+	String localdir = ''
+	String output = ''
 
-	String Result(SshConfig ac) {
-		Object sshuser=ac.getConfig("USER")
-		Object sshpass=ac.getConfig("PASS")
-		Object sshkey=ac.getConfig("KEY")
-		Object sshkeypass=ac.getConfig("KEYPASS")
-		Object sshport=ac.getConfig("PORT")
-		//println "----$sshuser"
+	String Result(ConfigObject ac) {
+
+        Object sshuser = ac?.USER ?: ''
+        Object sshpass = ac?.PASS ?: ''
+        Object sshkey = ac?.KEY ?: ''
+        Object sshkeypass = ac?.KEYPASS ?: ''
+        Object sshport = ac?.PORT
+
 		Integer scpPort = port
 		if (!scpPort) {
 			String sps=sshport.toString()

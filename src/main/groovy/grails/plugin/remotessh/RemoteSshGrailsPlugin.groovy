@@ -1,4 +1,3 @@
-import grails.plugin.remotessh.SshConfig
 import grails.plugins.Plugin
 
 class RemoteSshGrailsPlugin extends Plugin {
@@ -12,9 +11,5 @@ class RemoteSshGrailsPlugin extends Plugin {
 	def issueManagement = [system: 'GITHUB', url: 'https://github.com/vahidhedayati/RemoteSSH/issues']
 	def scm = [url: 'https://github.com/vahidhedayati/RemoteSSH']
 
-	def doWithSpring = {
-		sshConfig(SshConfig) {
-			grailsApplication = ref('grailsApplication')
-		}
-	}
+
 }
