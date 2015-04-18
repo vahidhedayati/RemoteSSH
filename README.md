@@ -23,7 +23,7 @@ Grails 3:  https://bintray.com/artifact/download/vahid/maven/remotessh-0.4.jar
 
 # Config.groovy variables required:
 
-Configure SSH and SCP by adding properties to grails-app/conf/Config.groovy under the "remotessh" key:
+Configure SSH and SCP by adding properties to conf/application.groovy under the "remotessh" key:
 
 
     # Option set a global username to access ssh through to remote host
@@ -48,9 +48,6 @@ Configure SSH and SCP by adding properties to grails-app/conf/Config.groovy unde
 ## TestController calling RemoteSSH
 ```groovy
 
-Controller tesing RemoteSSH
-
-```groovy
   package testrssh
 
   import grails.plugin.remotessh.RemoteSSH
@@ -76,7 +73,6 @@ Controller tesing RemoteSSH
 
 ```
 
-```
 
 
 
