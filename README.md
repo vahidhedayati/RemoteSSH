@@ -10,14 +10,14 @@ Dependency Grails 2:
 	compile ":remote-ssh:0.2"
 ```
 
-Dependency Grails 3:
+Dependency Grails 3 (build.gradle):
 
 ```groovy
-	compile ":remote-ssh:0.3"
+	compile "org.grails.plugins:remotessh:0.4"
 ```
 
 
-Grails 3:  https://bintray.com/artifact/download/vahid/maven/RemoteSSH-0.3.jar
+Grails 3:  https://bintray.com/artifact/download/vahid/maven/remotessh-0.4.jar
 	
 
 # Config.groovy variables required:
