@@ -19,28 +19,23 @@ class RemoteSCP {
     String remotedir = ""
     StringBuilder output = new StringBuilder()
 
-    String Result(ConfigObject ac) throws InterruptedException {
+    String Result(SshConfig ac) throws InterruptedException {
 
-        Object sshuser = ac?.USER ?: ''
-        Object sshpass = ac?.PASS ?: ''
-        Object sshkey = ac?.KEY ?: ''
-        Object sshkeypass = ac?.KEYPASS ?: ''
-        Object sshport = ac?.PORT
+        Object sshuser = ac.config.USER ?: ''
+        Object sshpass = ac.config.PASS ?: ''
+        Object sshkey = ac.config.KEY ?: ''
+        Object sshkeypass = ac.config.KEYPASS ?: ''
+        Object sshport = ac.config.PORT ?: ''
 
-		Integer scpPort = port
-		if (!scpPort) {
-			String sps=sshport.toString()
-			if (sps.matches("[0-9]+")) {
-				scpPort=Integer.parseInt(sps)
-			}
-		}
+        int scpPort
+        scpPort = port ?: sshport.toString().matches("[0-9]+") { scpPort = sshport as int } ?: 22
 
-		String username = user ?: sshuser.toString()
+        String username = user ?: sshuser.toString()
 		String password = userpass ?: sshpass.toString()
 		File keyfile = new File(sshkey.toString())
 		String keyfilePass = sshkeypass.toString()
 		try {
-			Connection conn = new Connection(host,scpPort ?: 22)
+			Connection conn = new Connection(host,scpPort)
 			/* Now connect */
 			conn.connect()
 			/* Authenticate */
