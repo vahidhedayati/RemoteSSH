@@ -20,6 +20,7 @@ Dependency Grails 3 (build.gradle):
 Grails 3:  https://bintray.com/artifact/download/vahid/maven/remotessh-0.4.jar
 	
 
+
 # Config.groovy variables required:
 
 Configure SSH and SCP by adding properties to grails-app/conf/Config.groovy under the "remotessh" key:
@@ -47,41 +48,34 @@ Configure SSH and SCP by adding properties to grails-app/conf/Config.groovy unde
 ## TestController calling RemoteSSH
 ```groovy
 
-package testrssh
-import grails.core.GrailsApplication
-import grails.plugin.remotessh.RemoteSSH
+Controller tesing RemoteSSH
 
-class TestController {
+```groovy
+  package testrssh
 
-    GrailsApplication grailsApplication
+  import grails.plugin.remotessh.RemoteSSH
+
+  class TestController {
+
+      def sshConfig
+
+      def index() {
+          RemoteSSH rsh = new RemoteSSH()
+          rsh.setHost('localhost')
+          rsh.setPort(22)
+          rsh.setUsercommand('whoami')
+          def g = rsh.Result(sshConfig)
+
+          render "---- ${g}"
+
+      }
+
+  }
 
 
-    def index() {
 
-        ConfigObject remotessh = grailsApplication.config.remotessh
-
-        RemoteSSH rsh = new RemoteSSH()
-
-
-        // THIS IS NOT DEFINED - since the user / key values passed in via configObject above..
-        //rsh.setUser('someUser')
-        //rsh.setUserpass('somePass')
-
-        rsh.setHost('someHOST')
-        rsh.setPort(22)
-        rsh.setUsercommand('hostname -s && uname -a && whoami')
-        def g = rsh.Result(remotessh)
-        render "---- $g"
-
-    }
-
-}
 ```
 
-## Test/conf/application.groovy:
-```groovy
-remotessh.KEY="/home/vahid/.ssh/id_rsa"
-remotessh.USER = "vahid"
 ```
 
 
@@ -114,4 +108,5 @@ With that in place it should connect to remote host run that script and look out
 2.1 Remove filter : basic replace, where __: was the filter:
 
     return rsh.Result(remotessh).toString().replace('__:', '')
+
 
