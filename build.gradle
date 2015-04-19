@@ -16,7 +16,7 @@ plugins {
     id "com.jfrog.bintray" version "1.1"
 }
 
-version "0.4"
+version "1.0"
 group "org.grails.plugins"
 
 apply plugin: 'maven-publish'
@@ -64,14 +64,17 @@ dependencies {
     testCompile "org.grails:grails-plugin-testing"
 
     console "org.grails:grails-console"
-
-	  //compile "ch.ethz.ganymed:ganymed-ssh2:build210"
- ///   compile 'ch.ethz.ganymed:ganymed-ssh2:build251beta1'
- //  compile 'ch.ethz.ganymed:ganymed-ssh2:261'
-   compile group: 'ch.ethz.ganymed', name: 'ganymed-ssh2', version:'build250'
+    compile 'org.grails.plugins:ajax-tags:1.0.0.BUILD-SNAPSHOT'
+    
+    // compile "ch.ethz.ganymed:ganymed-ssh2:build210"
+    // compile 'ch.ethz.ganymed:ganymed-ssh2:build251beta1'
+    // compile 'ch.ethz.ganymed:ganymed-ssh2:261'
+    compile group: 'ch.ethz.ganymed', name: 'ganymed-ssh2', version:'build250'
 
 }
 
 task wrapper(type: Wrapper) {
     gradleVersion = gradleWrapperVersion
 }
+
+
