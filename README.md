@@ -7,102 +7,70 @@ Grails RemoteSSH Plugin based on Ganymed SSH-2 library : Provides ( RemoteSSH + 
 Dependency Grails 2:
 
 ```groovy
-	compile ":remote-ssh:0.2"
+	compile ":remote-ssh:0.4"
 ```
+
+[Grails 2 source](https://github.com/vahidhedayati/RemoteSSH/tree/grails2-v0.3)
 
 Dependency Grails 3 (build.gradle):
 
 ```groovy
-	compile "org.grails.plugins:remotessh:0.4"
+	compile "org.grails.plugins:remotessh:3.0.1"
 ```
-
-
-Grails 3:  https://bintray.com/artifact/download/vahid/maven/remotessh-0.4.jar
+[Grails 3 source](https://github.com/vahidhedayati/RemoteSSH)
 	
+
+
+	
+#### For websocket live ssh connection / interaction: 
+Check out : [jssh](https://github.com/vahidhedayati/jssh)
 
 
 # Config.groovy variables required:
 
-Configure SSH and SCP by adding properties to conf/application.groovy under the "remotessh" key:
-
-
-    # Option set a global username to access ssh through to remote host
-    # If you are going to define user from above commands then leave it with empty speach marks
-    remotessh.USER = "USER"
-
-    # The password leave blank if you are about to use SSH Keys, otherwise provide password to ssh auth
-    remotessh.PASS=""
-
-    # The ssh key is your id_rsa or id_dsa - please note your tomcat will need access/permissions to file/location
-    remotessh.KEY="/home/youruser/.ssh/id_rsa"
-
-    # If you use a key pass for your key connections then provide it below
-    remotessh.KEYPASS=""
-
-    # The ssh port to connect through if not given will default to 22
-    remotessh.PORT="22"
-
-
-
-
-## TestController calling RemoteSSH
+Configure SSH and SCP by adding properties to grails-app/conf/Config.groovy under the "remotessh" key:
 ```groovy
+//Option set a global username to access ssh through to remote host
+//If you are going to define user from above commands then leave it with empty speach marks
+remotessh.USER = "USER"
 
-  package testrssh
+//The password leave blank if you are about to use SSH Keys, otherwise provide password to ssh auth
+remotessh.PASS=""
 
-  import grails.plugin.remotessh.RemoteSSH
+//The ssh key is your id_rsa or id_dsa - please note your tomcat will need access/permissions to file/location
+remotessh.KEY="/home/youruser/.ssh/id_rsa"
 
-  class TestController {
+//If you use a key pass for your key connections then provide it below
+remotessh.KEYPASS=""
 
-      def sshConfig
+//The ssh port to connect through if not given will default to 22
+remotessh.PORT="22"
+```
 
-      def index() {
-          RemoteSSH rsh = new RemoteSSH()
-          rsh.setHost('localhost')
-          rsh.setPort(22)
-          rsh.setUsercommand('whoami')
-          def g = rsh.Result(sshConfig)
+### [Youtube video walking through 0.3](https://www.youtube.com/watch?v=v_0nNJX4Xmk)
 
-          render "---- ${g}"
+#### [older method TestController calling RemoteSSH Grails 2](https://github.com/vahidhedayati/RemoteSSH/wiki/older-method)
 
-      }
+#### [older method TestController calling RemoteSSH Grails 3](https://github.com/vahidhedayati/RemoteSSH/wiki/older-method-grails3)
 
-  }
+#### [0.3+ gsp taglib call : run remote command ](https://github.com/vahidhedayati/test-rssh/blob/master/grails-app/controllers/test/rssh/TestController.groovy#L21-L26)
 
+#### [0.3+ gsp taglib call : remote SCP Directory ](https://github.com/vahidhedayati/test-rssh/blob/master/grails-app/views/test/scpDir.gsp)
+
+#### [0.3+ gsp taglib call : remote SCP File ](https://github.com/vahidhedayati/test-rssh/blob/master/grails-app/views/test/scpFile.gsp)
+
+#### [0.3+ gsp taglib call : remote SCP Get File ](https://github.com/vahidhedayati/test-rssh/blob/master/grails-app/views/test/scpGet.gsp)
+
+#### [0.3+ gsp taglib call : run remote command + reuse connection ](https://github.com/vahidhedayati/test-rssh/blob/master/grails-app/controllers/test/rssh/TestController.groovy#L52-L89)
+
+#### [Shell script example:](https://github.com/vahidhedayati/RemoteSSH/wiki/shell-script-example)
+
+## [Demo site grails 2.4.4 remote-ssh:0.3](https://github.com/vahidhedayati/test-rssh)
+## [Demo site grails 3.0.1 remote-ssh:3.0.1](https://github.com/vahidhedayati/testrssh)
+
+
+
+And now finally a big thank you to Burt Beckwith for adding so much flexibility to the global configuration and additional groovy calls. 
 
 
 ```
-
-
-
-
-# 2. Shell script example:
-I am about to pgrep mysqld then for the pid split out all of its running config then parse for datadir|socket|default-file and return the pid with those values starting with __:, all on one line.
-
-```bash
-	 mysqlpid=$(pgrep mysqld);for mid in $mysqlpid; do echo -n "__:$mid config is ";
-	 cfg1=$(ps wp $mid|grep $mid|sed -e 's/ \-/\n\-/g'|grep '^-'|egrep "datadir|socket|default-file"|tr  "\n\r" " ");
-	 echo  "$cfg1"; done
-```
-The above works fine on local terminal, and when if you do decide to create like example given at the very bottom to have a
- domainclass manage scripts, you should be able to put above into the shell script textarea of your domainclass --> scriptContent.
-
-
-But in order to make it work via the service as is, additional \backslashes have to be added:
-
-
-```groovy
-	 String testscript2='mid=$(pgrep mysql);for mpid in $mid; do echo -n \"__:$mpid config is \";
-	 mdet=$(ps wp $mpid|grep $mpid|sed -e \'s/ \\-/\\n\\-/g\'|grep \'^-\'|egrep \"datadir|socket|default-file\"|tr  \"\\n\\r\" \" \");
-	 echo  \"$mdet\"; done'
-
-
-```
-With that in place it should connect to remote host run that script and look out for __: displaying this back to the screen
-
-
-2.1 Remove filter : basic replace, where __: was the filter:
-
-    return rsh.Result(remotessh).toString().replace('__:', '')
-
-
