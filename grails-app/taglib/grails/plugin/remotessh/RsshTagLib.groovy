@@ -7,7 +7,6 @@ class RsshTagLib {
    RsshService rsshService
    
    def runCommand={attrs->
-      println "--- $attrs @@@"
 	   out << rsshService.runCommand(attrs)   
    }
    

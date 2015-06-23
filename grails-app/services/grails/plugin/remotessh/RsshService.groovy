@@ -10,7 +10,6 @@ class RsshService extends RsshConfService{
 
 
 	def runCommand(Map params) {
-		println "--- $params"
 		StringBuilder output = new StringBuilder()
 
 		Map pm = validateParams(params)
