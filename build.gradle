@@ -8,39 +8,37 @@ buildscript {
     }
     dependencies {
         classpath "org.grails:grails-gradle-plugin:$grailsVersion"
+        classpath 'com.bertramlabs.plugins:asset-pipeline-gradle:2.1.1'
     }
 }
 
 plugins {
     id "io.spring.dependency-management" version "0.5.1.RELEASE"
-    id "com.jfrog.bintray" version "1.1"
 }
 
-version "3.0.1"
-group "org.grails.plugins"
+version "0.1"
+group "testrssh"
 
-apply plugin: 'maven-publish'
+apply plugin: "spring-boot"
+apply plugin: "war"
+apply plugin: "asset-pipeline"
 apply plugin: 'eclipse'
 apply plugin: 'idea'
-apply plugin: "spring-boot"
-apply plugin: "org.grails.grails-plugin"
+apply plugin: "org.grails.grails-web"
 apply plugin: "org.grails.grails-gsp"
-// Used for publishing to central repository, remove if not needed
-//apply from:'https://raw.githubusercontent.com/grails/grails-profile-repository/master/profiles/plugin/templates/grailsCentralPublishing.gradle'
-//apply from:'https://raw.githubusercontent.com/grails/grails-profile-repository/master/profiles/plugin/templates/bintrayPublishing.gradle'
 
 ext {
     grailsVersion = project.grailsVersion
     gradleWrapperVersion = project.gradleWrapperVersion
 }
 
-sourceCompatibility = 1.7
-targetCompatibility = 1.7
-
+assets {
+    minifyJs = true
+    minifyCss = true
+}
 
 repositories {
     mavenLocal()
-    mavenCentral()
     maven { url "https://repo.grails.org/grails/core" }
 }
 
@@ -52,23 +50,30 @@ dependencyManagement {
 }
 
 dependencies {
-    provided 'org.springframework.boot:spring-boot-starter-logging'
-    provided "org.springframework.boot:spring-boot-starter-actuator"
-    provided "org.springframework.boot:spring-boot-autoconfigure"
-    provided "org.springframework.boot:spring-boot-starter-tomcat"
+    compile "org.springframework.boot:spring-boot-starter-logging"
+    compile "org.springframework.boot:spring-boot-starter-actuator"
+    compile "org.springframework.boot:spring-boot-autoconfigure"
+    compile "org.springframework.boot:spring-boot-starter-tomcat"
+    compile "org.grails:grails-dependencies"
+    compile "org.grails:grails-web-boot"
 
-    provided "org.grails:grails-web-boot"
-    provided "org.grails:grails-dependencies"
-    provided 'javax.servlet:javax.servlet-api:3.1.0'
+    compile "org.grails.plugins:hibernate"
+    //compile "org.grails.plugins:cache"
+    compile "org.hibernate:hibernate-ehcache"
 
-    testCompile "org.grails:grails-plugin-testing"
+    runtime "org.grails.plugins:asset-pipeline"
+    runtime "org.grails.plugins:scaffolding"
+
+//    testCompile "org.grails:grails-plugin-testing"
+//    testCompile "org.grails.plugins:geb"
+
+    // Note: It is recommended to update to a more robust driver (Chrome, Firefox etc.)
+//    testRuntime 'org.seleniumhq.selenium:selenium-htmlunit-driver:2.44.0'
 
     console "org.grails:grails-console"
-    compile 'org.grails.plugins:ajax-tags:1.0.0.BUILD-SNAPSHOT'
-    // compile "ch.ethz.ganymed:ganymed-ssh2:build210"
-    // compile 'ch.ethz.ganymed:ganymed-ssh2:build251beta1'
-    // compile 'ch.ethz.ganymed:ganymed-ssh2:261'
-    compile group: 'ch.ethz.ganymed', name: 'ganymed-ssh2', version:'build250'
+	compile project(':remotessh')
+	//compile "org.grails.plugins:remotessh:3.0.1"
+
 }
 
 task wrapper(type: Wrapper) {
