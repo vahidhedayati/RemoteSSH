@@ -4,15 +4,26 @@ RemoteSSH
 Grails RemoteSSH Plugin based on Ganymed SSH-2 library : Provides ( RemoteSSH + exec command ) (RemoteSCP) (RemoteSCPDir) (RemoteSCPGet)
 
 
-Dependency :
+Dependency Grails 2:
 
 ```groovy
-	compile ":remote-ssh:0.3" 
-```	
+	compile ":remote-ssh:0.3"
+```
+
+[Grails 2 source](https://github.com/vahidhedayati/RemoteSSH/tree/grails2-v0.3)
+
+Dependency Grails 3 (build.gradle):
+
+```groovy
+	compile "org.grails.plugins:remotessh:3.0.1"
+```
+[Grails 3 source](https://github.com/vahidhedayati/RemoteSSH)
+	
+
+
 	
 #### For websocket live ssh connection / interaction: 
 Check out : [jssh](https://github.com/vahidhedayati/jssh)
-
 
 
 # Config.groovy variables required:
@@ -38,7 +49,9 @@ remotessh.PORT="22"
 
 ### [Youtube video walking through 0.3](https://www.youtube.com/watch?v=v_0nNJX4Xmk)
 
-#### [older method TestController calling RemoteSSH](https://github.com/vahidhedayati/RemoteSSH/wiki/older-method)
+#### [older method TestController calling RemoteSSH Grails 2](https://github.com/vahidhedayati/RemoteSSH/wiki/older-method)
+
+#### [older method TestController calling RemoteSSH Grails 3](https://github.com/vahidhedayati/RemoteSSH/wiki/older-method-grails3)
 
 #### [0.3+ gsp taglib call : run remote command ](https://github.com/vahidhedayati/test-rssh/blob/master/grails-app/controllers/test/rssh/TestController.groovy#L21-L26)
 
@@ -53,7 +66,11 @@ remotessh.PORT="22"
 #### [Shell script example:](https://github.com/vahidhedayati/RemoteSSH/wiki/shell-script-example)
 
 ## [Demo site grails 2.4.4 remote-ssh:0.3](https://github.com/vahidhedayati/test-rssh)
+## [Demo site grails 3.0.1 remote-ssh:3.0.1](https://github.com/vahidhedayati/testrssh)
 
 
 
 And now finally a big thank you to Burt Beckwith for adding so much flexibility to the global configuration and additional groovy calls. 
+
+
+```
