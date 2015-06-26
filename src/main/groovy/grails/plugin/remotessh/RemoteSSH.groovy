@@ -32,8 +32,7 @@ class RemoteSSH {
 
 		File keyfile = new File(sshkey.toString())
 		String keyfilePass = sshkeypass.toString()
-
-        println "-- ${username} -- ${password} ${sshkey} : $scpPort"
+		
 
 		try {
 			Connection conn = new Connection(host,scpPort)
