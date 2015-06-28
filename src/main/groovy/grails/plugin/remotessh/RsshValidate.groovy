@@ -2,17 +2,17 @@ package grails.plugin.remotessh
 
 import grails.util.Holders
 
+import grails.validation.Validateable
 
 /*
  * @author  Vahid Hedayati - 26th June 2015
  *
- * Validation bean used in conjunction with taglib attributes 
+ * Validation bean used in conjunction with taglib attributes
  * and parameters passed to service.
  *
  */
 
-//@Validateable
-class RsshValidate {
+class RsshValidate implements Validateable {
 
 	String sshuser = getConfig('USER') as String
 	String sshpass = getConfig('PASS') as String
@@ -21,7 +21,7 @@ class RsshValidate {
 	def sshport = (getConfig('PORT'))?:22
 	String host = 'localhost'
 	String splitter='<br>'
-	
+
 	File keyfile = new File(sshkey)
 
 	//runCommand params
@@ -38,8 +38,8 @@ class RsshValidate {
 	String file=''
 	String localdir=''
 	String remotedir=''
-	
-	static contstraints = {
+
+	static constraints = {
 		usercommand nullable: true
 		file nullable: true
 		sudo nullable: true
@@ -54,7 +54,6 @@ class RsshValidate {
 		sshpass nullable:true
 		sshkey nullable:true
 		sshkeypass nullable:true
-		
 	}
 
 	def getConfig(String configProperty) {

@@ -15,41 +15,30 @@ import ch.ethz.ssh2.StreamGobbler
  */
 
 
-class RsshService extends RsshConfService{
+class RsshService {
 
 	static transactional = false
-
 	String runCommand(RsshValidate pm) {
 		StringBuilder output = new StringBuilder()
-		String host = pm.host
-		def sshport = pm.sshport
-		File keyfile = pm.keyfile
-		String sshkeypass = pm.sshkeypass
-		String sshuser = pm.sshuser
-		String sshpass = pm.sshpass
-		String usercommand = pm.usercommand
-		String sudo = pm.sudo
-		String filter = pm.filter
-		String splitter = pm.splitter
 		try {
 			// Do initial connection
-			Connection conn = connect(host,sshport as int)
+			Connection conn = connect(pm.host,pm.sshport as int)
 			// If we have a connection
 			if (conn) {
 				// grab the ssh session
-				Session sess = openSession(conn, keyfile,sshkeypass,sshuser,sshpass)
+				Session sess = openSession(conn, pm.keyfile,pm.sshkeypass,pm.sshuser,pm.sshpass)
 				if (sess) {
 					// if we have session run the command
 					// this is where you could keep connected and have a session
 					// in your own calls and run variety of commands if you wish
 					// to call this service in segments
-					output = executeCommand(sess, conn, usercommand, splitter, sudo, filter)
+					output = executeCommand(sess, conn, pm.usercommand, pm.splitter, pm.sudo, pm.filter)
 					closeConnection(conn,sess)
 				}else{
-					output << "No session $keyfile $sshkeypass $sshuser $sshpass"
+					output << "No session $pm.keyfile $pm.sshkeypass $pm.sshuser $pm.sshpass"
 				}
 			}else{
-				output << "No connection $host $sshport"
+				output << "No connection $pm.host $pm.sshport"
 			}
 		}catch(Exception e) {
 			output << e.message
@@ -59,31 +48,22 @@ class RsshService extends RsshConfService{
 
 	String scpDir(RsshValidate pm){
 		String output = ''
-		String host = pm.host
-		def sshport = pm.sshport
-		File keyfile = pm.keyfile
-		String sshkeypass = pm.sshkeypass
-		String sshuser = pm.sshuser
-		String sshpass = pm.sshpass
-		String remotedir = pm.remotedir
-		String localdir = pm.localdir
-		String splitter = pm.splitter
 		try {
 			// Do initial connection
-			Connection conn = connect(host,sshport as int)
+			Connection conn = connect(pm.host,pm.sshport as int)
 			// If we have a connection
 			if (conn) {
-				Session sess = openSession(conn, keyfile,sshkeypass,sshuser,sshpass)
+				Session sess = openSession(conn, pm.keyfile,pm.sshkeypass,pm.sshuser,pm.sshpass)
 				if (sess) {
-					scpDir(conn, sess, localdir, remotedir, "0600")
+					scpDir(conn, sess, pm.localdir, pm.remotedir, "0600")
 					closeConnection(conn,sess)
-					output = "$localdir should now be copied to $host:$remotedir${splitter}"
+					output = "$pm.localdir should now be copied to $pm.host:$pm.remotedir${pm.splitter}"
 				}else{
-					output = "No session $keyfile $sshkeypass $sshuser $sshpass"
+					output = "No session $pm.keyfile $pm.sshkeypass $pm.sshuser $pm.sshpass"
 				}
 
 			}else{
-				output = "No connection $host $sshport"
+				output = "No connection $pm.host $pm.sshport"
 			}
 		}catch(Exception e) {
 			output=e.message
@@ -93,29 +73,20 @@ class RsshService extends RsshConfService{
 
 	String scpFile(RsshValidate pm) {
 		String output = ''
-		String host = pm.host
-		def sshport = pm.sshport
-		File keyfile = pm.keyfile
-		String sshkeypass = pm.sshkeypass
-		String sshuser = pm.sshuser
-		String sshpass = pm.sshpass
-		String file = pm.file
-		String remotedir = pm.remotedir
-		String splitter = pm.splitter
 		try {
 			// Do initial connection
-			Connection conn = connect(host,sshport as int)
+			Connection conn = connect(pm.host,pm.sshport as int)
 			if (conn) {
-				Session sess = openSession(conn, keyfile,sshkeypass,sshuser,sshpass)
+				Session sess = openSession(conn, pm.keyfile,pm.sshkeypass,pm.sshuser,pm.sshpass)
 				if (sess) {
-					scpFile(conn, file, remotedir)
+					scpFile(conn, pm.file, pm.remotedir)
 					closeConnection(conn,sess)
 				}else{
-					output = "No session $keyfile $sshkeypass $sshuser $sshpass"
+					output = "No session $pm.keyfile $pm.sshkeypass $pm.sshuser $pm.sshpass"
 				}
-				output = "File $file should now be copied from $host to $remotedir: $file${splitter}"
+				output = "File $pm.file should now be copied from $pm.host to $pm.remotedir: $pm.file${pm.splitter}"
 			}else{
-				log.error "No connection $host $sshport"
+				log.error "No connection $pm.host $pm.sshport"
 			}
 		}catch(Exception e) {
 			output=e.message
@@ -125,32 +96,20 @@ class RsshService extends RsshConfService{
 
 	String scpGet(RsshValidate pm) {
 		String output = ''
-		String host = pm.host
-		def sshport = pm.sshport
-		//File keyfile
-		//if (pm.keyfile)  {
-		File keyfile = pm.keyfile
-		//}
-		String sshkeypass = pm.sshkeypass
-		String sshuser = pm.sshuser
-		String sshpass = pm.sshpass
-		String file = pm.file
-		String localdir = pm.localdir
-		String splitter = pm.splitter
 		try {
 			// Do initial connection
-			Connection conn = connect(host,sshport as int)
+			Connection conn = connect(pm.host,pm.sshport as int)
 			if (conn) {
-				Session sess = openSession(conn, keyfile,sshkeypass,sshuser,sshpass)
+				Session sess = openSession(conn, pm.keyfile,pm.sshkeypass,pm.sshuser,pm.sshpass)
 				if (sess) {
-					scpGet(conn, file, localdir)
+					scpGet(conn, pm.file, pm.localdir)
 					closeConnection(conn,sess)
 				}else{
-					output = "No session $keyfile $sshkeypass $sshuser $sshpass"
+					output = "No session $pm.keyfile $pm.sshkeypass $pm.sshuser $pm.sshpass"
 				}
-				output = "File $file should now be copied from $host to ${localdir}:${file}${splitter}"
+				output = "File $pm.file should now be copied from $pm.host to ${pm.localdir}:${pm.file}${pm.splitter}"
 			}else{
-				log.error "No connection $host $sshport"
+				log.error "No connection $pm.host $pm.sshport"
 			}
 		}catch(Exception e) {
 			output=e.message
@@ -281,7 +240,7 @@ class RsshService extends RsshConfService{
 	}
 
 
-	def closeConnection( Connection conn,Session sess=null) {
+	def closeConnection(Connection conn,Session sess=null) {
 		if (sess) {
 			closeSession(sess)
 		}
@@ -295,6 +254,5 @@ class RsshService extends RsshConfService{
 			sess.close()
 		}
 	}
-
 
 }

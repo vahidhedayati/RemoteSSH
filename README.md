@@ -7,7 +7,7 @@ Grails RemoteSSH Plugin based on Ganymed SSH-2 library : Provides ( RemoteSSH + 
 Dependency Grails 2:
 
 ```groovy
-	compile ":remote-ssh:0.4"
+	compile ":remote-ssh:0.5"
 ```
 
 [Grails 2 source](https://github.com/vahidhedayati/RemoteSSH/tree/grails2)
@@ -70,12 +70,14 @@ remotessh.PORT="22"
 
 
 
+
 # Version Info
 ```
+0.5 :   typo: constraints - further clean up of code
 0.4 : 	Removed Map validateParams out and introduced src/groovy/RsshValidate - updated all calls to use new bean for validation.
 		Added try catch around new service methods - messages now caught and sent to frontend - no more stacktraces using new service.
-
+		
 0,3 : 	Implementation of RsshService + RsshTagLib easier/alternative calls to access plugin
 0.2 : 	Tidyup and throwables added by Tobias Tschech
-0.1 : 	Initial release - using src/groovy calls - a lot of tidy up by Burt Beckwith
+0.1 : 	Initial release - using src/groovy calls - a lot of tidy up by Burt Beckwith 
 ```
