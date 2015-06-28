@@ -18,8 +18,6 @@ class RsshService {
 
 	static transactional = false
 
-	def grailsApplication
-
 	String runCommand(RsshValidate pm) {
 		StringBuilder output = new StringBuilder()
 		try { 
@@ -256,9 +254,4 @@ class RsshService {
 			sess.close()
 		}
 	}
-
-	private ConfigObject getConfig() {
-		grailsApplication.config?.remotessh
-	}
-
 }
