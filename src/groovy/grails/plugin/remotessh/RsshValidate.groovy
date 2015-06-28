@@ -38,8 +38,8 @@ class RsshValidate {
 	String file=''
 	String localdir=''
 	String remotedir=''
-	
-	static contstraints = {
+
+	static constraints = {
 		usercommand nullable: true
 		file nullable: true
 		sudo nullable: true
@@ -54,7 +54,6 @@ class RsshValidate {
 		sshpass nullable:true
 		sshkey nullable:true
 		sshkeypass nullable:true
-		
 	}
 
 	def getConfig(String configProperty) {
