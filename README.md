@@ -69,8 +69,6 @@ remotessh.PORT="22"
 ## [Demo site grails 3.0.1 remote-ssh:3.0.1](https://github.com/vahidhedayati/testrssh)
 
 
-
-
 # Version Info
 ```
 0.5 :   typo: constraints - further clean up of code

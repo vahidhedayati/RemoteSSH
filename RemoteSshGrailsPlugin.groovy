@@ -8,7 +8,7 @@ class RemoteSshGrailsPlugin {
 	def authorEmail = "badvad@gmail.com"
 	def description = 'Uses the Ganymed SSH-2 library to provide RemoteSSH, RemoteSCP, RemoteSCPDir, and RemoteSCPGet'
 	def documentation = "http://grails.org/plugin/remote-ssh"
-	def license = "GPL2"
+	def license = "APACHE"
 	def issueManagement = [system: 'GITHUB', url: 'https://github.com/vahidhedayati/RemoteSSH/issues']
 	def scm = [url: 'https://github.com/vahidhedayati/RemoteSSH']
 
