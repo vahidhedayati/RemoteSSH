@@ -15,7 +15,7 @@ Dependency Grails 2:
 Dependency Grails 3 (build.gradle):
 
 ```groovy
-	compile "org.grails.plugins:RemoteSSH:3.0.1"
+	compile "org.grails.plugins:RemoteSSH:3.0.2"
 ```
 [Grails 3 source](https://github.com/vahidhedayati/RemoteSSH)
 	
