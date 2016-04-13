@@ -11,7 +11,7 @@ buildscript {
     }
 }
 
-version "3.0.3"
+version "3.0.4"
 group "org.grails.plugins"
 
 apply plugin:"eclipse"
@@ -55,11 +55,25 @@ dependencies {
     testCompile "org.grails.plugins:geb"
     testRuntime "org.seleniumhq.selenium:selenium-htmlunit-driver:2.47.1"
     testRuntime "net.sourceforge.htmlunit:htmlunit:2.18"
-	compile group: 'ch.ethz.ganymed', name: 'ganymed-ssh2', version:'build250'
-	compile "org.grails.plugins:RemoteSSH:3.0.2"
-
+    compile group: 'ch.ethz.ganymed', name: 'ganymed-ssh2', version:'build250'
+    compile 'org.grails.plugins:ajax-tags:1.0.0'
 }
 
 task wrapper(type: Wrapper) {
     gradleVersion = gradleWrapperVersion
 }
+grailsPublish {
+    // TODO: Provide values here
+    user = 'user'
+    key = 'key'
+    githubSlug = 'foo/bar'
+    license {
+        name = 'Apache-2.0'
+    }
+    title = "Grails Remote SSH Plugin"
+    desc = "Uses the Ganymed SSH-2 library to provide RemoteSSH, RemoteSCP, RemoteSCPDir, and RemoteSCPGet"
+    developers = [vahid:"Vahid Hedayati"]
+    portalUser = ""
+    portalPassword = ""
+}
+
