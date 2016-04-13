@@ -11,7 +11,7 @@ buildscript {
     }
 }
 
-version "3.0.2"
+version "3.0.3"
 group "org.grails.plugins"
 
 apply plugin:"eclipse"
@@ -56,23 +56,10 @@ dependencies {
     testRuntime "org.seleniumhq.selenium:selenium-htmlunit-driver:2.47.1"
     testRuntime "net.sourceforge.htmlunit:htmlunit:2.18"
 	compile group: 'ch.ethz.ganymed', name: 'ganymed-ssh2', version:'build250'
+	compile "org.grails.plugins:RemoteSSH:3.0.2"
 
 }
 
 task wrapper(type: Wrapper) {
     gradleVersion = gradleWrapperVersion
-}
-grailsPublish {
-    // TODO: Provide values here
-    user = 'user'
-    key = 'key'
-    githubSlug = 'foo/bar'
-    license {
-        name = 'Apache-2.0'
-    }
-    title = "My Plugin"
-    desc = "Full plugin description"
-    developers = [johndoe:"John Doe"]
-    portalUser = ""
-    portalPassword = ""    
 }
