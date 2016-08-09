@@ -48,10 +48,7 @@ dependencies {
     provided "org.grails:grails-dependencies"
     provided 'javax.servlet:javax.servlet-api:3.1.0'
 
-    //compile group: 'ch.ethz.ganymed', name: 'ganymed-ssh2', version:'build250'
-    //compile 'ch.ethz.ganymed:ganymed-ssh2:build250'
     compile group: 'ch.ethz.ganymed', name: 'ganymed-ssh2', version: '262'
-    //compile 'ch.ethz.ganymed:ganymed-ssh2:262'
     compile 'org.grails.plugins:ajax-tags:1.0.0'
 }
 

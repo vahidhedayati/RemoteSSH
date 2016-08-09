@@ -10,8 +10,8 @@ class RemotesshGrailsPlugin extends Plugin {
     def documentation = "https://github.com/vahidhedayati/RemoteSSH"
     def license = "APACHE"
     def developers = [name: 'Vahid Hedayati', email: 'badvad@gmail.com']
-    def issueManagement = [system: 'GITHUB', url: 'https://github.com/vahidhedayati/remotessh/issues']
-    def scm = [url: 'https://github.com/vahidhedayati/remotessh']
+    def issueManagement = [system: 'GITHUB', url: 'https://github.com/vahidhedayati/RemoteSSH/issues']
+    def scm = [url: 'https://github.com/vahidhedayati/RemoteSSH']
     Closure doWithSpring() { {->
         sshConfig(SshConfig)
         } 
