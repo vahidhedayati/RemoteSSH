@@ -155,9 +155,20 @@ class RsshService {
 		return sess
 	}
 
+	
+	
+	//0.6 override methods to see if issue is resolved
+	StringBuilder executeCommand(Session sess,Connection conn, String usercommand, String splitter) {
+		executeCommand(sess,conn,usercommand,splitter,'','',false)
+	}
+	
+	StringBuilder executeCommand(Session sess,Connection conn, String usercommand, String splitter,String sudo, String filter) {
+		executeCommand(sess,conn,usercommand,splitter,sudo,filter,false)
+	}
+	
 	// Now that we have session and connection lets attempt to execute actual usercommand
 	StringBuilder executeCommand(Session sess,Connection conn, String usercommand, String splitter, 
-		String sudo=null, String filter=null, boolean hasConnection=null) {
+		String sudo, String filter, boolean hasConnection) {
 		
 		StringBuilder output = new StringBuilder()
 
