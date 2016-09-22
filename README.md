@@ -7,7 +7,7 @@ Grails RemoteSSH Plugin based on Ganymed SSH-2 library : Provides ( RemoteSSH + 
 Dependency Grails 2:
 
 ```groovy
-	compile ":remote-ssh:0.6"
+	compile ":remote-ssh:0.7"
 ```
 
 [Grails 2 source](https://github.com/vahidhedayati/RemoteSSH/tree/grails2)

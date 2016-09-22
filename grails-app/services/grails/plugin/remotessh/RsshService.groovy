@@ -155,17 +155,28 @@ class RsshService {
 		return sess
 	}
 
-	
-	
-	//0.6 override methods to see if issue is resolved
+	// 0.6 / 0.7 override resolves issue caused by nulls introduced pre 0.5		
 	StringBuilder executeCommand(Session sess,Connection conn, String usercommand, String splitter) {
 		executeCommand(sess,conn,usercommand,splitter,'','',false)
+	}
+	
+	StringBuilder executeCommand(Session sess,Connection conn, String usercommand, String splitter,String sudo) {
+		executeCommand(sess,conn,usercommand,splitter,sudo,'',false)
+	}
+	
+	StringBuilder executeCommand(Session sess,Connection conn, String usercommand, String splitter,String sudo,boolean hasConnection) {
+		executeCommand(sess,conn,usercommand,splitter,sudo,'',hasConnection)
+	}
+	
+	StringBuilder executeCommand(Session sess,Connection conn, String usercommand, String splitter,boolean hasConnection) {
+		executeCommand(sess,conn,usercommand,splitter,'','',hasConnection)
 	}
 	
 	StringBuilder executeCommand(Session sess,Connection conn, String usercommand, String splitter,String sudo, String filter) {
 		executeCommand(sess,conn,usercommand,splitter,sudo,filter,false)
 	}
 	
+	// To save rewriting / messing around with end user's setup introduced above overrides
 	// Now that we have session and connection lets attempt to execute actual usercommand
 	StringBuilder executeCommand(Session sess,Connection conn, String usercommand, String splitter, 
 		String sudo, String filter, boolean hasConnection) {
