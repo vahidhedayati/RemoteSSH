@@ -55,7 +55,7 @@ class RsshService {
 			if (conn) {
 				Session sess = openSession(conn, pm.keyfile,pm.sshkeypass,pm.sshuser,pm.sshpass)
 				if (sess) {
-					scpDir(conn, sess, pm.localdir, pm.remotedir, "0600")
+					scpDir(conn, sess, pm.localdir, pm.remotedir, pm.permission,pm.charSet)
 					closeConnection(conn,sess)
 					output = "$pm.localdir should now be copied to $pm.host:$pm.remotedir${pm.splitter}"
 				}else{
@@ -79,7 +79,7 @@ class RsshService {
 			if (conn) {
 				Session sess = openSession(conn, pm.keyfile,pm.sshkeypass,pm.sshuser,pm.sshpass)
 				if (sess) {
-					scpFile(conn, pm.file, pm.remotedir)
+					scpFile(conn, pm.file, pm.remotedir,pm.permission, pm.charSet)
 					closeConnection(conn,sess)
 				}else{
 					output = "No session $pm.keyfile $pm.sshkeypass $pm.sshuser $pm.sshpass"
@@ -102,7 +102,7 @@ class RsshService {
 			if (conn) {
 				Session sess = openSession(conn, pm.keyfile,pm.sshkeypass,pm.sshuser,pm.sshpass)
 				if (sess) {
-					scpGet(conn, pm.file, pm.localdir)
+					scpGet(conn, pm.file, pm.localdir,pm.charSet)
 					closeConnection(conn,sess)
 				}else{
 					output = "No session $pm.keyfile $pm.sshkeypass $pm.sshuser $pm.sshpass"
@@ -220,7 +220,7 @@ class RsshService {
 	}
 
 	void scpDir(Connection conn, Session sess, String localDirectory,
-			String remoteTargetDirectory, String mode) throws Exception {
+			String remoteTargetDirectory, String mode,String charSet=null) throws Exception {
 		try {
 			File curDir = new File(localDirectory)
 			final String[] fileList = curDir.list()
@@ -231,11 +231,14 @@ class RsshService {
 					sess = conn.openSession()
 					sess.execCommand("mkdir $subDir")
 					sess.waitForCondition(ChannelCondition.EOF, 0)
-					scpDir(conn, sess, fullFileName, subDir, mode)
+					scpDir(conn, sess, fullFileName, subDir, mode,charSet)
 					sleep(200)
 				} else {
 					SCPClient scpc = conn.createSCPClient()
-					scpc.put(fullFileName, remoteTargetDirectory, mode)
+					if (charSet) {
+						scpc.setCharset(charSet)
+					}
+					scpc.put(fullFileName, 1L, remoteTargetDirectory, mode)
 				}
 			}
 		} catch (Exception e) {
@@ -243,18 +246,24 @@ class RsshService {
 		}
 	}
 
-	void scpFile(Connection conn, String file, String remotedir) throws Exception {
+	void scpFile(Connection conn, String file, String remotedir,String permission, String charSet=null) throws Exception {
 		try {
 			SCPClient scp = conn.createSCPClient()
-			scp.put(file, remotedir)
+			if (charSet) {
+				scp.setCharset(charSet)
+			}
+			scp.put(file, 1L, remotedir, permission)
 		} catch (Exception e) {
 			throw new Exception(e)
 		}
 	}
 
-	void scpGet(Connection conn, String file, String localdir) throws Exception {
+	void scpGet(Connection conn, String file, String localdir,String charSet=null) throws Exception {
 		try {
 			SCPClient scp = conn.createSCPClient()
+			if (charSet) {
+				scp.setCharset(charSet)
+			}
 			scp.get(file, localdir)
 		} catch (Exception e) {
 			throw new Exception(e)

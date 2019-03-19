@@ -17,13 +17,16 @@ class RemoteSCPDir  {
 	String localdir = ""
 	String remotedir = ""
 	String output = ""
-
+	String charsetName
+	
 	String Result(SshConfig ac) {
 		Object sshuser=ac.getConfig("USER")
 		Object sshpass=ac.getConfig("PASS")
 		Object sshkey=ac.getConfig("KEY")
 		Object sshkeypass=ac.getConfig("KEYPASS")
 		Object sshport=ac.getConfig("PORT")
+		Object charSet=ac.getConfig("CHARACTERSET")
+		String characterSet = charSet ? charSet.toString() : charsetName
 		//println "----$sshuser"
 		Integer scpPort = port
 		if (!scpPort) {
@@ -52,7 +55,7 @@ class RemoteSCPDir  {
 				throw new IOException("Authentication failed.")
 			// Session sess = conn.openSession()
 			// sess.execCommand("mkdir -p $remotedir")
-			putDir(conn, localdir, remotedir, "0600")
+			putDir(conn, localdir, remotedir, "0600",characterSet)
 			conn.close()
 			output = "$localdir should now be copied to $hostname:$remotedir<br>"
 		} catch (IOException e) {
@@ -62,7 +65,7 @@ class RemoteSCPDir  {
 	}
 
 	private static void putDir(Connection conn, String localDirectory,
-			String remoteTargetDirectory, String mode) throws IOException {
+			String remoteTargetDirectory, String mode,String characterSet=null) throws IOException {
 
 		File curDir = new File(localDirectory)
 		final String[] fileList = curDir.list()
@@ -73,10 +76,13 @@ class RemoteSCPDir  {
 				Session sess = conn.openSession()
 				sess.execCommand("mkdir $subDir")
 				sess.waitForCondition(ChannelCondition.EOF, 0)
-				putDir(conn, fullFileName, subDir, mode)
+				putDir(conn, fullFileName, subDir, mode,characterSet)
 			} else {
 				SCPClient scpc = conn.createSCPClient()
-				scpc.put(fullFileName, remoteTargetDirectory, mode)
+				if (characterSet) {
+					scpc.setCharset(characterSet)
+				}
+				scpc.put(fullFileName, 1L, remoteTargetDirectory, mode)
 			}
 		}
 	}

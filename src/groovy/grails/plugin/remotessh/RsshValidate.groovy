@@ -18,7 +18,10 @@ class RsshValidate {
 	String sshpass = getConfig('PASS') as String
 	String sshkey = getConfig('KEY') as String
 	String sshkeypass = getConfig('KEYPASS') as String
+	String charSet=getConfig("CHARACTERSET") as String
 	def sshport = (getConfig('PORT'))?:22
+	String permission=getConfig("PERMISSION") ? getConfig("PERMISSION") as String: '0600' 
+	
 	String host = 'localhost'
 	String splitter='<br>'
 	
@@ -54,6 +57,7 @@ class RsshValidate {
 		sshpass nullable:true
 		sshkey nullable:true
 		sshkeypass nullable:true
+		charSet  nullable:true
 	}
 
 	def getConfig(String configProperty) {
