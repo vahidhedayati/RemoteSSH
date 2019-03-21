@@ -18,6 +18,7 @@ class RemoteSCPDir  {
 	String remotedir = ""
 	String output = ""
 	String charsetName
+	String mode
 	
 	String Result(SshConfig ac) {
 		Object sshuser=ac.getConfig("USER")
@@ -26,7 +27,9 @@ class RemoteSCPDir  {
 		Object sshkeypass=ac.getConfig("KEYPASS")
 		Object sshport=ac.getConfig("PORT")
 		Object charSet=ac.getConfig("CHARACTERSET")
-		String characterSet = charSet ? charSet.toString() : charsetName
+		Object perm=ac.getConfig("PERMISSION")
+		String characterSet = (charsetName ?: (charSet ? charSet.toString() : null))
+		String permission =(mode ?: (perm ?perm.toString() :"0600"))
 		//println "----$sshuser"
 		Integer scpPort = port
 		if (!scpPort) {
@@ -55,7 +58,7 @@ class RemoteSCPDir  {
 				throw new IOException("Authentication failed.")
 			// Session sess = conn.openSession()
 			// sess.execCommand("mkdir -p $remotedir")
-			putDir(conn, localdir, remotedir, "0600",characterSet)
+			putDir(conn, localdir, remotedir, permission,characterSet)
 			conn.close()
 			output = "$localdir should now be copied to $hostname:$remotedir<br>"
 		} catch (IOException e) {

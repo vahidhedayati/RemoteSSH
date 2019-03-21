@@ -1,7 +1,5 @@
 package grails.plugin.remotessh
 
-import org.apache.commons.io.IOUtils
-
 import ch.ethz.ssh2.Connection
 import ch.ethz.ssh2.SCPClient
 
@@ -63,13 +61,8 @@ class RemoteSCP {
 			if (characterSet) {
 				scp.setCharset(characterSet)
 			}
-			InputStream inputStream=new FileInputStream(file)
-			
-			byte[] expected = IOUtils.toByteArray(inputStream)
-			
-			scp.put(file, expected.length as Long,  remotedir, permission)
+			scp.put(file, file.length() as Long,  remotedir, permission)
 			conn.close()
-
 			output = "File $file should now be copied to $host:$remotedir<br>"
 
 		} catch (IOException e) {

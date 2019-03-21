@@ -17,6 +17,7 @@ class RemoteSCPGet  {
 	String localdir = ""
 	String output = ""
 	String charsetName
+	String mode
 	
 	String Result(SshConfig ac) {
 		Object sshuser=ac.getConfig("USER")
@@ -37,7 +38,8 @@ class RemoteSCPGet  {
 		String password = userpass ?: sshpass.toString()
 		File keyfile = new File(sshkey.toString())
 		String keyfilePass = sshkeypass.toString()
-		String characterSet = charSet ? charSet.toString() : charsetName
+		String characterSet = (charsetName ?: (charSet ? charSet.toString() : null))
+		
 		try {
 			Connection conn = new Connection(host,scpPort ?: 22)
 			/* Now connect */
@@ -59,7 +61,7 @@ class RemoteSCPGet  {
 			if (characterSet) {
 				scp.setCharset(characterSet)
 			}
-			scp.get(file, localdir)
+			scp.get(file)
 			conn.close()
 			output = "File $file should now be copied from $host to localdir: $localdir<br>"
 
