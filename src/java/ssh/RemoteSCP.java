@@ -3,10 +3,13 @@ package ssh;
 import grails.plugin.remotessh.SshConfig;
 
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
 
 import ch.ethz.ssh2.Connection;
 import ch.ethz.ssh2.SCPClient;
+import ch.ethz.ssh2.SFTPv3Client;
+import ch.ethz.ssh2.SFTPv3FileHandle;
 
 /**
  * Copies a file to remote server.
@@ -144,16 +147,34 @@ public class RemoteSCP {
 			}
 			if (isAuthenticated == false)
 				throw new IOException("Authentication failed.");
-
-			/* Create a session */
-			SCPClient scp = conn.createSCPClient();
-			if (this.characterSet!=null) {
-				System.out.println(" >>>"+this.characterSet);
-				scp.setCharset(this.characterSet);
+			File actualFile = new File(file);
+			FileOutputStream out =  null;
+			try {
+				out = new FileOutputStream(remotedir+File.separator+actualFile.getName());
+				SFTPv3Client sFTPv3Client = new SFTPv3Client(conn);
+				SFTPv3FileHandle handle = sFTPv3Client.openFileRO(file);
+				byte[] cache = new byte[1024];
+				int i = 0;
+				int offset = 0;
+				while((i = sFTPv3Client.read(handle, offset, cache, 0, 1024)) != -1){
+					out.write(cache, 0, i);
+					offset += i;
+				}
+				sFTPv3Client.closeFile(handle);
+		        if (handle.isClosed()){
+				    sFTPv3Client.close();
+		        } 
+			} catch (IOException e) {
+				e.printStackTrace();
+			} finally {
+				try {
+					if (out != null) {
+						out.close();
+					}
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
 			}
-			System.out.println(" >>> p"+this.permission);
-			scp.put(file,new Long(file.length()), remotedir,this.permission);
-			
 			conn.close();
 
 			output = "File " + file + " should now be copied to " + host + ":"

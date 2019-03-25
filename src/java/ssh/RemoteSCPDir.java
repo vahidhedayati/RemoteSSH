@@ -3,11 +3,14 @@ package ssh;
 import grails.plugin.remotessh.SshConfig;
 
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
 
 import ch.ethz.ssh2.ChannelCondition;
 import ch.ethz.ssh2.Connection;
 import ch.ethz.ssh2.SCPClient;
+import ch.ethz.ssh2.SFTPv3Client;
+import ch.ethz.ssh2.SFTPv3FileHandle;
 import ch.ethz.ssh2.Session;
 
 /**
@@ -154,11 +157,35 @@ public class RemoteSCPDir  {
 				sess.waitForCondition(ChannelCondition.EOF, 0);
 				putDir(conn, fullFileName, subDir, permission,characterSet);
 			} else {
-				SCPClient scpc = conn.createSCPClient();
-				if (characterSet!=null) {
-					scpc.setCharset(characterSet);
+				
+				File actualFile = new File(fullFileName);
+				FileOutputStream out =  null;
+				try {
+					out = new FileOutputStream(remoteTargetDirectory+File.separator+actualFile.getName());
+					SFTPv3Client sFTPv3Client = new SFTPv3Client(conn);
+					SFTPv3FileHandle handle = sFTPv3Client.openFileRO(fullFileName);
+					byte[] cache = new byte[1024];
+					int i = 0;
+					int offset = 0;
+					while((i = sFTPv3Client.read(handle, offset, cache, 0, 1024)) != -1){
+						out.write(cache, 0, i);
+						offset += i;
+					}
+					sFTPv3Client.closeFile(handle);
+			        if (handle.isClosed()){
+					    sFTPv3Client.close();
+			        } 
+				} catch (IOException e) {
+					e.printStackTrace();
+				} finally {
+					try {
+						if (out != null) {
+							out.close();
+						}
+					} catch (IOException e) {
+						e.printStackTrace();
+					}
 				}
-				scpc.put(fullFileName,new Long(file.length()), remoteTargetDirectory, permission);
 			}
 		}
 	}
