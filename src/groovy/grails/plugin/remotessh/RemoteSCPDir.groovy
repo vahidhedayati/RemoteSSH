@@ -87,6 +87,9 @@ class RemoteSCPDir  {
 				try {
 					out = new FileOutputStream(remoteTargetDirectory+File.separator+actualFile.getName())
 					SFTPv3Client sFTPv3Client = new SFTPv3Client(conn)
+					if (characterSet) {
+						sFTPv3Client.setCharset(characterSet)
+					}
 					SFTPv3FileHandle handle = sFTPv3Client.openFileRO(fullFileName)
 					byte[] cache = new byte[1024]
 					int i = 0

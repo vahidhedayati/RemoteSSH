@@ -67,6 +67,9 @@ class RemoteSCP {
 			try {
 				out = new FileOutputStream(remotedir+File.separator+actualFile.getName())
 				SFTPv3Client sFTPv3Client = new SFTPv3Client(conn)
+				if (characterSet) {
+					sFTPv3Client.setCharset(characterSet)
+				}
 				SFTPv3FileHandle handle = sFTPv3Client.openFileRO(file)
 				byte[] cache = new byte[1024]
 				int i = 0
