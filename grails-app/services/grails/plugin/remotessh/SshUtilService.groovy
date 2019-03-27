@@ -7,7 +7,9 @@ import ch.ethz.ssh2.ChannelCondition
 import ch.ethz.ssh2.Connection
 import ch.ethz.ssh2.SCPClient
 import ch.ethz.ssh2.SCPInputStream
+import ch.ethz.ssh2.SFTPException
 import ch.ethz.ssh2.SFTPv3Client
+import ch.ethz.ssh2.SFTPv3FileAttributes
 import ch.ethz.ssh2.SFTPv3FileHandle
 import ch.ethz.ssh2.Session
 import ch.ethz.ssh2.StreamGobbler
@@ -15,8 +17,62 @@ import ch.ethz.ssh2.StreamGobbler
 class SshUtilService {
 	def grailsApplication
 	
-	private static final Logger log = LoggerFactory.getLogger(this.class);
+	private static final Logger log = LoggerFactory.getLogger(this.class)
+	private static final int BUFSIZE = 1024
 	
+	public static final int S_IFMT = 0170000 // bitmask for the file type bitfields
+
+	public static final int S_IFDIR = 0040000 // directory
+	
+	/**
+	 * 0.10 introduces initialise  which simplifies and wraps requirements in 
+	 * SSHUtil class 
+	 * with initialise  connection, SCPClient and SFTPv3Client are all initiated
+	 * @return
+	 */
+	
+	SSHUtil getInitialise() {
+		Connection connection = openConnection
+		return new SSHUtil(connection)
+	}
+	SSHUtil initialise(boolean singleInstance=false) {
+		Connection connection = openConnection
+		return new SSHUtil(connection,singleInstance)
+	}
+	SSHUtil initialise(String host, int port,boolean singleInstance=false) {
+		Connection connection = openConnection(host,port)
+		return new SSHUtil(connection,singleInstance)
+	}
+	SSHUtil initialise(String username, String password, String host, int port, boolean singleInstance=false) {
+		Connection connection = openConnection(host,port,username,password)
+		return new SSHUtil(connection,singleInstance)
+	}
+	
+	SSHUtil initialise(String username, String keyfile, String keyfilePass,String host, int port, boolean singleInstance=false) {
+		Connection connection = openConnection(host,port,username,keyfile,keyfilePass)
+		return new SSHUtil(connection,singleInstance)
+	}
+	
+	SSHUtil initialise(String username, String password,String host, int port, String characterSet, boolean singleInstance=false) {
+		Connection connection = openConnection(host,port,username,password)
+		return new SSHUtil(connection,singleInstance,characterSet)
+	}
+	
+	SSHUtil initialise(String username, String keyfile, String keyfilePass,String host, int port, String characterSet, boolean singleInstance=false) {
+		Connection connection = openConnection(host,port,username,keyfile,keyfilePass)
+		return new SSHUtil(connection,singleInstance,characterSet)
+	}
+	
+
+	/**
+	 * runs default no host no port which finds as per configuration file or defaults
+	 * @return sh2 Connection for reuse
+	 * 
+	 * if you have ran intialise no need to run this
+	 */
+	Connection getOpenConnection() {
+		return openConnection()
+	}
 	
 	/**
 	 * @param host   - optional
@@ -35,23 +91,14 @@ class SshUtilService {
 	 * sshUtilService.getOpenConnection("10.0.0.1",32) //where it connects to 10.0.0.1 on port 32
 	 * @returns a ssh2 Connection for reuse
 	 */
-	Connection getOpenConnection(String host=null, int port=null) {
+	Connection openConnection(String host=null, int port=null) {
 		if (!host) {
 			host=config?.HOST?.toString()?:"127.0.0.1"
 		}
 		if (!port) {
 			port=((config?.PORT as int)?:22)
 		}
-		return openConnection(host,port)
-	}
-	/**
-	 * Part of above but simplified to simplify end user call to method
-	 * @param host
-	 * @param port
-	 * @return
-	 */
-	Connection openConnection(String host, int port) {
-		String username = config?.user?.toString()?:'root'
+		String username = config?.USER?.toString()?:'root'
 		String pass = config?.PASS?.toString()
 		String sshkey=config?.KEY?.toString()
 		String sshkeypass=config.KEYPASS?.toString()
@@ -71,18 +118,7 @@ class SshUtilService {
 	 * @return ssh2 Connection
 	 */
 	Connection openConnection(String host, int port, String username, String keyfile, String keyfilePass) {
-		Connection conn = new Connection(host, port)
-		try {
-			conn.connect()
-			if (conn.authenticateWithPublicKey(username,keyfile, keyfilePass)) {
-				return conn
-			}
-			log.warn "SSH Authentication failed.";
-			conn.close();
-		} catch (IOException e) {
-			log.error(e.getMessage(), e)
-		}
-		return null
+		return SSHUtil.openConnection(host,port,username,keyfile,keyfilePass)
 	}
 	
 	/**
@@ -94,194 +130,299 @@ class SshUtilService {
 	 * @return ssh2 connection
 	 */
 	Connection openConnection(String host, int port, String username, String password) {
-		Connection conn = new Connection(host, port)
-		try {
-			conn.connect()
-			if (conn.authenticateWithPassword(username,password)) {
-				return conn
-			}
-			log.warn "SSH Authentication failed."
-			conn.close();
-		} catch (IOException e) {
-			log.error(e.getMessage(), e)
-		}
-		return null
+		return SSHUtil.openConnection(host,port,username,password)
 	}
 	
-	String readRemoteFile(String remoteFile, Connection connection=null, boolean closeConnection=false) {
+	
+	String readRemoteFile(String remoteFile, Connection connection=null, boolean closeConnection=false) throws Exception {
 		if (!connection) {
 			connection=openConnection
+			closeConnection=true
 		}
+		return readRemoteFile(new SSHUtil(connection,closeConnection),remoteFile) 
+	}
+
+	/**
+	 * This is using SCPClient to read remote file
+	 * //sshUtil.remoteFile=remoteFile
+	 * //sshUtil.readRemoteFile()
+	 * @param sshUtil
+	 * @param remoteFile
+	 * @return
+	 * @throws Exception
+	 */
+	String readRemoteFile(SSHUtil sshUtil,String remoteFile) throws Exception {
+		return sshUtil.readRemoteFile(remoteFile)
+	}
+	
+	
+	String readFile(String remoteFile, Connection connection=null,boolean closeConnection=false) throws Exception {
+		if (!connection) {
+			connection=openConnection
+			closeConnection=true
+		}
+		return readFile(new SSHUtil(connection,closeConnection),remoteFile)
+	}
+	
+	/**
+	 * This is using SFTPv3Client to read file
+	 * 
+	 * 	//sshUtil.remoteFile=remoteFile
+		//return sshUtil.readFile()
+	 * @param sshUtil
+	 * @param remoteFile
+	 * @return
+	 * @throws Exception
+	 */
+	String readFile(SSHUtil sshUtil,String remoteFile) throws Exception {
+		return sshUtil.readFile(remoteFile)
+	}
+	
+	/**
+	 * writes a file to remote server
+	 * @param localFile
+	 * @param remoteDir
+	 * @throws Exception
+	 */
+	void writeFile(String localFile, String remoteDir,  Connection connection=null, boolean closeConnection=false, String characterSet=null) throws Exception {
+		if (!connection) {
+			connection=openConnection
+			closeConnection=true
+		}
+		writeFile(new SSHUtil(connection,closeConnection),localFile,remoteDir)
+	}
+	
+	/**
+	 * simplified version of original above
+	 * 
+	 * Other ways
+	 * //sshUtil.localFile=localFile
+		//sshUtil.remoteDir=remoteDir
+		//sshUtil.writeFile()
+	 * @param sshUtil
+	 * @param localFile
+	 * @param remoteDir
+	 * @throws Exception
+	 */
+	void writeFile(SSHUtil sshUtil,String localFile, String remoteDir) throws Exception {
+		sshUtil.writeFile(localFile,remoteDir)
+	}
+	
+	void writeFileWithName(String localFile, String remoteFile,  Connection connection=null, boolean closeConnection=false,String characterSet=null) throws Exception {
+		if (!connection) {
+			connection=openConnection
+			closeConnection=true
+		}
+		writeFileWithName(new SSHUtil(connection,closeConnection),localFile,remoteFile)
+	}
+	/**
+	 * Other ways:
+	 * 	//sshUtil.localFile=localFile
+		//sshUtil.remoteFile=remoteFile
+		//return sshUtil.writeFileWithName()
 		
-		StringBuffer resultBuffer = new StringBuffer()
-		try {
-			SCPClient client = new SCPClient(connection)
-			SCPInputStream scpInputStream = client.get(remoteFile)
-			BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(scpInputStream))
-			String data
-			while ((data = bufferedReader.readLine()) != null) {
-				resultBuffer.append(data + "\n")
-			}
-			return resultBuffer.toString()
-		} catch (IOException e) {
-			log.error(e.getMessage(), e)
-		} finally {
-			if (closeConnection) {
-				connClose(connection)
-			}
+	 * @param sshUtil
+	 * @param localFile
+	 * @param remoteFile
+	 * @throws Exception
+	 */
+	void writeFileWithName(SSHUtil sshUtil,String localFile, String remoteFile) throws Exception {
+		sshUtil.writeFileWithName(localFile,remoteFile)
+	}
+	
+	/**
+	 * Very similar to writeFile except SFTPv3Client  is used slightly differently to write file 
+	 * @param localFile
+	 * @param remoteDir
+	 * @throws Exception
+	 */
+	void putFile(String localFile, String remoteDir,  Connection connection=null, boolean closeConnection=false, String characterSet=null) throws Exception {
+		if (!connection) {
+			connection=openConnection
+			closeConnection=true
+		}
+		putFile(new SSHUtil(connection,closeConnection),localFile,remoteDir)
+		
+	}
+	
+	/**
+	 * sshUtik.remoteDir=remoteDir
+	 * sshUtil.localFile=localFile
+	 * sshUtil.putFile()
+	 * @param sshUtil
+	 * @param localFile
+	 * @param remoteDir
+	 * @throws Exception
+	 */
+	void putFile(SSHUtil sshUtil,String localFile, String remoteDir) throws Exception {
+		sshUtil.putFile(localFile,remoteDir)
+	}
+	
+	void putFiles(List<String> localFilePaths, String remoteFolder,Connection connection=null, boolean closeConnection=false) throws Exception {
+		if (!connection) {
+			connection=openConnection
+			closeConnection=true
+		}
+		putFiles(new SSHUtil(connection,closeConnection),localFilePaths,remoteFolder)
+	}
+	
+	void putFiles(SSHUtil sshUtil,List<String> localFilePaths ,String remoteFolder) throws Exception {
+		sshUtil.putFiles(localFilePaths,remoteFolder)
+	}
 			
-		}
-	}
-	
-	void readFile(String remoteFile,  Connection connection=null) {
+	void getFile(String remoteFilePath, String localFolder, Connection connection=null, boolean closeConnection=false,String characterSet=null) throws Exception {
 		if (!connection) {
 			connection=openConnection
+			closeConnection=true
 		}
-		try {
-			SFTPv3Client sftPv3Client = new SFTPv3Client(connection)
-			SFTPv3FileHandle sftPv3FileHandle = sftPv3Client.openFileRO(remoteFile)
-			byte[] bs = new byte[11]
-			int i = 0
-			long offset = 0
-			while (i != -1) {
-				i = sftPv3Client.read(sftPv3FileHandle, offset, bs, 0, bs.length)
-				offset += i
-			}
-			System.out.println(new String(bs))
+		getFile(new SSHUtil(connection,closeConnection),remoteFilePath,localFolder)
+	}
+	/**
+	 * 
+	 * Examples other than below:
+	 * 
+	 * //sshUtil.localDir=localFolder
+		//sshUtil.remoteFile=remoteFilePath
+		//return sshUtil.getFile()
 
-		} catch (IOException e) {
-			e.printStackTrace()
-		}
+	 * @param sshUtil
+	 * @param remoteFilePath
+	 * @param localFolder
+	 */
+	void getFile(SSHUtil sshUtil,String remoteFilePath, String localFolder) {
+		sshUtil.getFile(remoteFilePath,localFolder)
 	}
 	
-	void writeFile(String localFile, String remoteDir,  Connection connection=null, String characterSet=null) {
+	void getFiles(List<String> files, String localFolder,  Connection connection=null, boolean closeConnection=false) throws Exception {
 		if (!connection) {
 			connection=openConnection
+			closeConnection=true
 		}
-		FileOutputStream out =  null;
-		try {
-			File actualFile = new File(localFile);
-			out = new FileOutputStream(remoteDir+File.separator+actualFile.getName());
-			
-			SFTPv3Client sFTPv3Client = new SFTPv3Client(connection);
-			if (characterSet) {
-				sFTPv3Client.setCharset(characterSet)
-			}
-			SFTPv3FileHandle handle = sFTPv3Client.openFileRO(localFile);
-			byte[] cache = new byte[1024];
-			int i = 0;
-			int offset = 0;
-			while((i = sFTPv3Client.read(handle, offset, cache, 0, 1024)) != -1){
-				out.write(cache, 0, i);
-				offset += i;
-			}
-			sFTPv3Client.closeFile(handle);
-			if (handle.isClosed()){
-				sFTPv3Client.close();
-			}
-		} catch (IOException e) {
-			e.printStackTrace()
-		}
+		getFiles(new SSHUtil(connection,closeConnection),files,localFolder)
+	}
+	void getFiles(SSHUtil sshUtil,List<String> files, String localFolder) {
+		sshUtil.getFiles(files,localFolder) 
 	}
 	
-	void writeFileWithName(String localFile, String remoteFile,  Connection connection=null, String characterSet=null) {
-		if (!connection) {
-			connection=openConnection
-		}
-		FileOutputStream out =  null;
-		try {
-			File actualFile = new File(localFile)
-			SFTPv3Client sftPv3Client = new SFTPv3Client(connection)
-			if (characterSet) {
-				sftPv3Client.setCharset(characterSet)
-			}
-			sftPv3Client.createFile(remoteFile)
-			SFTPv3FileHandle sftPv3FileHandle = sftPv3Client.openFileWAppend(remoteFile)
-			byte[] bytesArray = new byte[(int) actualFile.length()]
-			FileInputStream fileInputStream  = new FileInputStream(actualFile)
-			fileInputStream.read(bytesArray)
-			fileInputStream.close()
-			sftPv3Client.write(sftPv3FileHandle, 0, bytesArray, 0, bytesArray.length)
-		} catch (IOException e) {
-			e.printStackTrace()
-		}
-	}
-	
-
-	String execute(Connection conn=null, String cmd) {
+	/**
+	 * Execute a command
+	 * @param cmd
+	 * @return
+	 * @throws Exception
+	 */
+	String execute(Connection conn=null, String cmd, boolean closeConnection=false) throws Exception {
 		if (!conn) {
 			conn=openConnection
+			closeConnection=true
 		}
-		Session session
-		StringBuffer buffer = new StringBuffer()
-		if (!cmd||!conn) {
-			return null
+		return execute(new SSHUtil(conn,closeConnection),cmd)	
+	}
+	
+	/**
+	 	//sshUtil.cmd=cmd
+		//return sshUtil.execute()
+	 * @param sshUtil
+	 * @param cmd
+	 * @return
+	 */
+	String execute(SSHUtil sshUtil,String cmd) {
+		sshUtil.execute(cmd)
+	}
+	
+	/**
+	 * checks to see if file exists
+	 * @param filename
+	 * @return
+	 * @throws Exception
+	 */
+	boolean fileExists(String filename,Connection connection=null,boolean closeConnection=false) throws Exception {
+		if (!connection) {
+			connection=openConnection
+			closeConnection=true
 		}
-		InputStream stdOut
-		try {
-			session = conn.openSession()
-			session.execCommand(cmd)
-			stdOut = new StreamGobbler(session.getStdout())
-			BufferedReader stdOutRead = new BufferedReader(new InputStreamReader(stdOut))
-			String line = stdOutRead.readLine()
-			while (line != null) {
-				buffer.append(line)
-				buffer.append(System.getProperty("line.separator"))
-				line = stdOutRead.readLine()
-			}
-			session.waitForCondition(ChannelCondition.EXIT_STATUS, Long.MAX_VALUE)
-			int ret = session.getExitStatus()
-			if (ret != 0) {
-				log.error("exec_error")
-			}
-			return buffer.toString()
-		} catch (Exception e) {
-			log.error(e.getMessage(), e)
-		} finally {
-			session.close()
+		return fileExists(new SSHUtil(connection,closeConnection),filename)
+	}
+	
+	/**
+	 * sshUtil.localFile=fileName
+	 * boolean fileExists = sshUtil.fileExists()
+	 * @param sshUtil
+	 * @param filename
+	 * @return
+	 */
+	boolean fileExists(SSHUtil sshUtil,String filename) {
+		return sshUtil.fileExists(filename)
+	}
+	
+	/**
+	 * Deletes a remote file
+	 * @param pathName
+	 * @throws IOException
+	 */
+	void deleteRemoteFile(String pathName,Connection connection=null,boolean closeConnection=false) throws IOException {
+		if (!connection) {
+			connection=openConnection
+			closeConnection=true
 		}
-		return null
+		deleteRemoteFile(new SSHUtil(connection,closeConnection),pathName)
+	}
+	
+	void deleteRemoteFile(SSHUtil sshUtil,String remoteFile) {
+		sshUtil.deleteRemoteFile(remoteFile)
+	}
+	
+	long remoteFileSize(String remoteFile,Connection connection=null,boolean closeConnection=false) throws Exception {
+		if (!connection) {
+			connection=openConnection
+			closeConnection=true
+		}
+		return remoteFileSize(new SSHUtil(connection,closeConnection),remoteFile)
+	}
+	/**
+	 * 	//sshUtil.remoteFile=remoteFile
+		//return sshUtil.remoteFileSize()
+	 * @param sshUtil
+	 * @param remoteFile
+	 * @return
+	 */
+	long remoteFileSize(SSHUtil sshUtil,String remoteFile) {
+		return sshUtil.remoteFileSize(remoteFile)
 	}
 
-	void connClose(Connection conn) {
-		if (conn) {
+	
+	/**
+	 * Will decide on if closeConnection is provided if so will close connection
+	 * @param conn
+	 */
+	void disconnectConnection(Connection conn, boolean closeConnection=true) {
+		if (conn && closeConnection) {
 			conn.close()
 		}
 	}
 
-	void connTest() {
-		Connection conn
-		try {
-			conn = openConnection
-		} finally {
-			connClose(conn)
-		}
-	}
-
-	public void executeTest() {
-		String cmd = "uname -a;";
-		cmd += "netstat -s;";
-		cmd += "df -h | awk 'NR==2 {print \$2}';";
-		cmd += "free -m | awk 'NR==2 {print \$2}';";
-		cmd += "vmstat 1 3 |tail -1 |awk '{printf(\"%s\\n\",\$15)}';";
-		BigDecimal b1 = new BigDecimal(361);
-		BigDecimal b2 = new BigDecimal(2000);
-		double usageMemory = b1.divide(b2, 2, BigDecimal.ROUND_HALF_UP).doubleValue();
-		println(usageMemory * 100 + "%");
-		Connection conn = openConnection
-		String execute = execute(conn, cmd);
-		connClose(conn);
-		System.out.println(execute)
-
+	
+	void createRemoteDirs(Connection conn, SFTPv3Client sc, String path) throws Exception {
+		SSHUtil sshUtil=new SSHUtil()
+		sshUtil.connection=conn
+		sshUtil.client=sc
+		createRemoteDirs(sshUtil,path)
 	}
 	
-	public void readFileTest() {
-		Connection conn = openConnection
-		String remoteFile = "/tmp/test.txt"
-				readRemoteFile(remoteFile, conn);
-				readFile(remoteFile,conn);
-		//writeFile(remoteFile, conn)
-		connClose(conn)
+	/**
+	 * createRemoteDirs remotely
+	 * @param sshUtil
+	 * @param path
+	 */
+	void createRemoteDirs(SSHUtil sshUtil, String path) {
+		sshUtil.createRemoteDirs(path)
+	}
+	
+	SCPClient getScpClient(Connection connection, String characterSet=null) {
+		return SSHUtil.getScpClient(connection,characterSet)
+	}
+	
+	SFTPv3Client sftpClient(Connection connection, String characterSet=null) {
+		return SSHUtil.sftpClient(connection,characterSet)
 	}
 	
 	private ConfigObject getConfig() {
