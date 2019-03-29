@@ -110,6 +110,29 @@ def index() {
 		output.createDir1=sshUtilService.createRemoteDirs(sshUtil,'/tmp/remote/1/2/3')
 		output.createDir2=sshUtil.createRemoteDirs('/tmp/remote/3/4/5')
 		
+		/**
+		 * How to use your own custom configuration file mapping - we are replacing the default
+		 * remotessh grails config with mySshConfigVar part of 0.11 release
+		 */
+				
+		SSHUtil sshUtil1 = new SSHUtil()
+		sshUtil1.configVariable='mySshConfigVar'
+		sshUtil1.initialise
+		// sshUtil.initialise('someHost',22)
+		sshUtil1.localFile='/tmp/test2.txt'
+		boolean doesItExist = sshUtil.fileExists()
+		println "file exists = ${doesItExist}"
+		sshUtil1.deleteRemoteFile('/tmp/test2.txt')
+		doesItExist = sshUtil1.fileExists()
+		println "file exists = ${doesItExist}"
+		
+		
+		
+		/* Disconnect from ssh session if singleInstance is false */
+		//sshUtilService.disconnect(sshUtil)
+		
+		sshUtil.disconnect()
+		
 		render output as JSON
 	}
 	

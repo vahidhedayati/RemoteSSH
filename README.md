@@ -7,7 +7,7 @@ Grails RemoteSSH Plugin based on Ganymed SSH-2 library : Provides ( RemoteSSH + 
 Dependency Grails 2:
 
 ```groovy
-	compile ":remote-ssh:0.7"
+	compile ":remote-ssh:0.11"
 ```
 
 [Grails 2 source](https://github.com/vahidhedayati/RemoteSSH/tree/grails2)
@@ -19,8 +19,19 @@ Dependency Grails 3 (build.gradle):
 ```
 [Grails 3 source](https://github.com/vahidhedayati/RemoteSSH)
 	
+Updates on 0.9 of grails 2 branch:
+----
+
+[How to use 0.9 revision](https://github.com/vahidhedayati/RemoteSSH/tree/grails2/revision-0.9.md)
 
 
+0.10 updates
+---
+
+[How to use 0.10+ revision](https://github.com/vahidhedayati/RemoteSSH/tree/grails2/revision-0.10.md)
+[Class documentation](https://github.com/vahidhedayati/RemoteSSH/tree/grails2/docs)
+[SSHUtil](https://github.com/vahidhedayati/RemoteSSH/tree/grails2/docs/groovy/SSHUtil.html)
+[SshUtilService](https://github.com/vahidhedayati/RemoteSSH/tree/grails2/docs/groovy/SshUtilService.html)
 	
 #### For websocket live ssh connection / interaction: 
 Check out : [jssh](https://github.com/vahidhedayati/jssh)
@@ -47,6 +58,8 @@ remotessh.KEYPASS=""
 remotessh.PORT="22"
 ```
 
+Please refer to [How to use 0.10+ revision](https://github.com/vahidhedayati/RemoteSSH/tree/grails2/revision-0.10.md) to find out how to override the configuration key variable with SSHUtil 
+
 ### [Youtube video walking through 0.3](https://www.youtube.com/watch?v=v_0nNJX4Xmk)
 
 #### [older method TestController calling RemoteSSH Grails 2](https://github.com/vahidhedayati/RemoteSSH/wiki/older-method)
@@ -68,18 +81,7 @@ remotessh.PORT="22"
 ## [Demo site grails 2.4.4 remote-ssh:0.3](https://github.com/vahidhedayati/test-rssh)
 ## [Demo site grails 3.0.1 remote-ssh:3.0.1](https://github.com/vahidhedayati/testrssh)
 
-Updates on 0.9 of grails 2 branch:
-----
 
-[How to use 0.9 revision](https://github.com/vahidhedayati/RemoteSSH/tree/grails2/revision-0.9.md)
-
-
-0.10 updates
----
-
-[new methods](https://github.com/vahidhedayati/RemoteSSH/tree/grails2/methods.md)
-
-[How to use 0.10 revision](https://github.com/vahidhedayati/RemoteSSH/tree/grails2/revision-0.10.md)
 
 
 # Version Info

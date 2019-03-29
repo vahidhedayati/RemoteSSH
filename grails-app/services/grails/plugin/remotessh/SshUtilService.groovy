@@ -91,7 +91,7 @@ class SshUtilService {
 	 * sshUtilService.getOpenConnection("10.0.0.1",32) //where it connects to 10.0.0.1 on port 32
 	 * @returns a ssh2 Connection for reuse
 	 */
-	Connection openConnection(String host=null, int port=null) {
+	Connection openConnection(String host=null, int port=0) {
 		if (!host) {
 			host=config?.HOST?.toString()?:"127.0.0.1"
 		}
@@ -265,7 +265,6 @@ class SshUtilService {
 		}
 		putFiles(new SSHUtil(connection,closeConnection),localFilePaths,remoteFolder)
 	}
-	
 	void putFiles(SSHUtil sshUtil,List<String> localFilePaths ,String remoteFolder) throws Exception {
 		sshUtil.putFiles(localFilePaths,remoteFolder)
 	}
@@ -389,7 +388,9 @@ class SshUtilService {
 		return sshUtil.remoteFileSize(remoteFile)
 	}
 
-	
+	void disconnect(SSHUtil sshUtil) {
+		sshUtil.disconnect()
+	}
 	/**
 	 * Will decide on if closeConnection is provided if so will close connection
 	 * @param conn
