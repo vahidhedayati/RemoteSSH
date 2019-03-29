@@ -29,9 +29,18 @@ Updates on 0.9 of grails 2 branch:
 ---
 
 [How to use 0.10+ revision](https://github.com/vahidhedayati/RemoteSSH/tree/grails2/revision-0.10.md)
-[Class documentation](https://github.com/vahidhedayati/RemoteSSH/tree/grails2/docs)
-[SSHUtil](https://github.com/vahidhedayati/RemoteSSH/tree/grails2/docs/groovy/SSHUtil.html)
-[SshUtilService](https://github.com/vahidhedayati/RemoteSSH/tree/grails2/docs/groovy/SshUtilService.html)
+
+
+[Documentation for class usage](http://vahidhedayati.github.io/RemoteSSH/all-docs.html)
+
+
+[SSHUtil](http://vahidhedayati.github.io/RemoteSSH/gapi/grails/plugin/remotessh/SSHUtil.html)
+
+
+[SshUtilService](http://vahidhedayati.github.io/RemoteSSH/gapi/grails/plugin/remotessh/SshUtilService.html)
+
+
+
 	
 #### For websocket live ssh connection / interaction: 
 Check out : [jssh](https://github.com/vahidhedayati/jssh)
