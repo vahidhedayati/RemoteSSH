@@ -2,7 +2,8 @@ package grails.plugin.remotessh
 
 import ch.ethz.ssh2.ChannelCondition
 import ch.ethz.ssh2.Connection
-import ch.ethz.ssh2.SCPClient
+import ch.ethz.ssh2.SFTPv3Client
+import ch.ethz.ssh2.SFTPv3FileHandle
 import ch.ethz.ssh2.Session
 
 /**
@@ -10,33 +11,41 @@ import ch.ethz.ssh2.Session
  */
 class RemoteSCPDir  {
 
-    String host = ''
-    String user = ''
-    String sudo = ''
-    Integer port = 0
-    String userpass = ''
-    String usercommand = ''
-    String localdir = ''
-    String remotedir = ''
-    StringBuilder output = new StringBuilder()
 
-    String Result(SshConfig ac) throws InterruptedException {
+	String hostname = ""
+	String user = ""
+	Integer port=0
+	String userpass=""
+	String localdir = ""
+	String remotedir = ""
+	String output = ""
+	String charsetName
+	String mode
 
-        Object sshuser = ac.config.USER ?: ''
-        Object sshpass = ac.config.PASS ?: ''
-        Object sshkey = ac.config.KEY ?: ''
-        Object sshkeypass = ac.config.KEYPASS ?: ''
-        Object sshport = ac.config.PORT ?: ''
-
-        int scpPort
-        scpPort = port ?: sshport.toString().matches("[0-9]+") { scpPort = sshport as int } ?: 22
-
-        String username = user ?: sshuser.toString()
+	String Result(SshConfig ac) {
+		Object sshuser=ac.getConfig("USER")
+		Object sshpass=ac.getConfig("PASS")
+		Object sshkey=ac.getConfig("KEY")
+		Object sshkeypass=ac.getConfig("KEYPASS")
+		Object sshport=ac.getConfig("PORT")
+		Object charSet=ac.getConfig("CHARACTERSET")
+		Object perm=ac.getConfig("PERMISSION")
+		String characterSet = (charsetName ?: (charSet ? charSet.toString() : null))
+		String permission =(mode ?: (perm ?perm.toString() :"0600"))
+		//println "----$sshuser"
+		Integer scpPort = port
+		if (!scpPort) {
+			String sps=sshport.toString()
+			if (sps.matches("[0-9]+")) {
+				scpPort=Integer.parseInt(sps)
+			}
+		}
+		String username = user ?: sshuser.toString()
 		String password = userpass ?: sshpass.toString()
 		File keyfile = new File(sshkey.toString())
 		String keyfilePass = sshkeypass.toString()
 		try {
-			Connection conn = new Connection(hostname,scpPort)
+			Connection conn = new Connection(hostname,scpPort ?: 22)
 			/* Now connect */
 			conn.connect()
 			/* Authenticate */
@@ -49,8 +58,9 @@ class RemoteSCPDir  {
 			}
 			if (!isAuthenticated)
 				throw new IOException("Authentication failed.")
-
-			putDir(conn, localdir, remotedir, "0600")
+			// Session sess = conn.openSession()
+			// sess.execCommand("mkdir -p $remotedir")
+			putDir(conn, localdir, remotedir, permission,characterSet)
 			conn.close()
 			output = "$localdir should now be copied to $hostname:$remotedir<br>"
 		} catch (IOException e) {
@@ -60,7 +70,7 @@ class RemoteSCPDir  {
 	}
 
 	private static void putDir(Connection conn, String localDirectory,
-			String remoteTargetDirectory, String mode) throws IOException {
+							   String remoteTargetDirectory, String mode,String characterSet=null) throws IOException {
 
 		File curDir = new File(localDirectory)
 		final String[] fileList = curDir.list()
@@ -71,10 +81,39 @@ class RemoteSCPDir  {
 				Session sess = conn.openSession()
 				sess.execCommand("mkdir $subDir")
 				sess.waitForCondition(ChannelCondition.EOF, 0)
-				putDir(conn, fullFileName, subDir, mode)
+				putDir(conn, fullFileName, subDir, mode,characterSet)
 			} else {
-				SCPClient scpc = conn.createSCPClient()
-				scpc.put(fullFileName, remoteTargetDirectory, mode)
+				File actualFile = new File(fullFileName)
+				FileOutputStream out =  null
+				try {
+					out = new FileOutputStream(remoteTargetDirectory+File.separator+actualFile.getName())
+					SFTPv3Client sFTPv3Client = new SFTPv3Client(conn)
+					if (characterSet) {
+						sFTPv3Client.setCharset(characterSet)
+					}
+					SFTPv3FileHandle handle = sFTPv3Client.openFileRO(fullFileName)
+					byte[] cache = new byte[1024]
+					int i = 0
+					int offset = 0
+					while((i = sFTPv3Client.read(handle, offset, cache, 0, 1024)) != -1){
+						out.write(cache, 0, i)
+						offset += i
+					}
+					sFTPv3Client.closeFile(handle)
+					if (handle.isClosed()){
+						sFTPv3Client.close()
+					}
+				} catch (IOException e) {
+					e.printStackTrace()
+				} finally {
+					try {
+						if (out) {
+							out.close()
+						}
+					} catch (IOException e) {
+						e.printStackTrace()
+					}
+				}
 			}
 		}
 	}
