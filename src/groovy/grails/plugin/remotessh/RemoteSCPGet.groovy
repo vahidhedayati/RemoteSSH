@@ -1,7 +1,8 @@
 package grails.plugin.remotessh
 
 import ch.ethz.ssh2.Connection
-import ch.ethz.ssh2.SCPClient
+import ch.ethz.ssh2.SFTPv3Client
+import ch.ethz.ssh2.SFTPv3FileHandle
 
 /**
  * Used by AddFTP and AddServerRemote classes This uses
@@ -18,6 +19,7 @@ class RemoteSCPGet  {
 	String output = ""
 	String charsetName
 	String mode
+	private static final int BUFSIZE = 1024
 	
 	String Result(SshConfig ac) {
 		Object sshuser=ac.getConfig("USER")
@@ -56,14 +58,33 @@ class RemoteSCPGet  {
 			if (!isAuthenticated)
 				throw new IOException("Authentication failed.")
 
-			/* Create a session */
-			SCPClient scp = conn.createSCPClient()
-			if (characterSet) {
-				scp.setCharset(characterSet)
+			String fileName,localFile
+			if (file) {
+				fileName=(new File(file)).getName()
+				if (fileName) {
+					localFile = localdir + File.separator + fileName
+				}
 			}
-			scp.get(file)
+			if (localFile) {
+				SFTPv3Client client = new SFTPv3Client(conn)
+				File actualFile = new File(localFile)
+				SFTPv3FileHandle handle = client.openFileRO(file)
+				BufferedOutputStream bfout = new BufferedOutputStream(new FileOutputStream(actualFile))
+				byte[] buf = new byte[BUFSIZE]
+				int count = 0
+				int bufsiz = 0
+				while ((bufsiz = client.read(handle, count, buf, 0, BUFSIZE)) != -1) {
+					bfout.write(buf, 0, bufsiz)
+					count += bufsiz
+				}
+				bfout.close()
+				client.closeFile(handle)
+				if (handle.isClosed()){
+					client.close()
+				}
+				output = "File $file should now be copied from $host to localdir: $localdir<br>"
+			}
 			conn.close()
-			output = "File $file should now be copied from $host to localdir: $localdir<br>"
 
 		} catch (IOException e) {
 			output += e.toString()

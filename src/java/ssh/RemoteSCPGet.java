@@ -2,18 +2,22 @@ package ssh;
 
 import grails.plugin.remotessh.SshConfig;
 
+import java.io.BufferedOutputStream;
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
 
 import ch.ethz.ssh2.Connection;
-import ch.ethz.ssh2.SCPClient;
+import ch.ethz.ssh2.SFTPv3Client;
+import ch.ethz.ssh2.SFTPv3FileHandle;
 
 /**
  * Used by AddFTP and AddServerRemote classes This uses
  * SSHConfig Interface Gets files from remote hosts
  */
 public class RemoteSCPGet  {
-
+	private static final int BUFSIZE = 1024;
+	  
 	String host = "";
 	String user = "";
 	Integer port=0;
@@ -125,16 +129,36 @@ public class RemoteSCPGet  {
 			if (isAuthenticated == false)
 				throw new IOException("Authentication failed.");
 
-			/* Create a session */
-			SCPClient scp = conn.createSCPClient();
-			if (characterSet!=null) {
-				scp.setCharset(characterSet);
+			String fileName=null;
+			String localFile=null;
+			if (file!=null) {
+				fileName=(new File(file)).getName();
+				if (fileName!=null) {
+					localFile = localdir + File.separator + fileName;
+				}
 			}
-			scp.get(file);
+			if (localFile!=null) {
+				SFTPv3Client client = new SFTPv3Client(conn);
+				File actualFile = new File(localFile);
+				SFTPv3FileHandle handle = client.openFileRO(file);
+				BufferedOutputStream bfout = new BufferedOutputStream(new FileOutputStream(actualFile));
+				byte[] buf = new byte[BUFSIZE];
+				int count = 0;
+				int bufsiz = 0;
+				while ((bufsiz = client.read(handle, count, buf, 0, BUFSIZE)) != -1) {
+					bfout.write(buf, 0, bufsiz);
+					count += bufsiz;
+				}
+				bfout.close();
+				client.closeFile(handle);
+				if (handle.isClosed()){
+					client.close();
+				}
+				
+				output = "File " + file + " should now be copied from " + host
+						+ " to localdir: " + localdir + "<br>";
+			}
 			conn.close();
-			output = "File " + file + " should now be copied from " + host
-					+ " to localdir: " + localdir + "<br>";
-
 		return output;
 	}
 }
