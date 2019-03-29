@@ -149,7 +149,7 @@ class SSHUtil {
 	String readFile(String givenFile=null) throws Exception {
 		remoteFile=givenFile?:remoteFile
 		if (remoteFile) {
-			handle =client.openFileRO()
+			handle =client.openFileRO(remoteFile)
 			byte[] bs = new byte[11]
 			int i = 0
 			long offset = 0
