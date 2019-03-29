@@ -1,28 +1,12 @@
 package grails.plugin.remotessh
 
-import org.slf4j.Logger
-import org.slf4j.LoggerFactory
-
-import ch.ethz.ssh2.ChannelCondition
 import ch.ethz.ssh2.Connection
 import ch.ethz.ssh2.SCPClient
-import ch.ethz.ssh2.SCPInputStream
-import ch.ethz.ssh2.SFTPException
 import ch.ethz.ssh2.SFTPv3Client
-import ch.ethz.ssh2.SFTPv3FileAttributes
-import ch.ethz.ssh2.SFTPv3FileHandle
-import ch.ethz.ssh2.Session
-import ch.ethz.ssh2.StreamGobbler
 
 class SshUtilService {
 	def grailsApplication
 	
-	private static final Logger log = LoggerFactory.getLogger(this.class)
-	private static final int BUFSIZE = 1024
-	
-	public static final int S_IFMT = 0170000 // bitmask for the file type bitfields
-
-	public static final int S_IFDIR = 0040000 // directory
 	
 	/**
 	 * 0.10 introduces initialise  which simplifies and wraps requirements in 
