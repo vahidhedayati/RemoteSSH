@@ -23,7 +23,7 @@ Dependency Grails 3 (build.gradle):
 0.10+ updates
 ---
 
-[How to use 0.13+ revision](https://github.com/vahidhedayati/RemoteSSH/tree/grails2/revision-0.13.md)
+[How to use 0.13+ revision](https://github.com/vahidhedayati/RemoteSSH/tree/grails2/release-0.13.md)
 
 [How to use 0.10 - 0.13 revision](https://github.com/vahidhedayati/RemoteSSH/tree/grails2/revision-0.10.md)
 
