@@ -1,7 +1,7 @@
 import grails.plugin.remotessh.SshConfig
 
 class RemoteSshGrailsPlugin {
-	def version = "0.12"
+	def version = "0.13"
 	def grailsVersion = "2.0 > *"
 	def title = "Remote SSH Plugin"
 	def author = "Vahid Hedayati"

@@ -118,6 +118,22 @@ class SshUtilService {
 	}
 	
 	
+	
+	void mkdir(SSHUtil sshUtil,String remoteDir) throws Exception {
+		sshUtil.mkdir(remoteDir)
+	}
+	
+	void mkDirs(SSHUtil sshUtil,String remoteDir) {
+		sshUtil.mkDirs(remoteDir)
+	}
+	void rmdir(SSHUtil sshUtil,String remoteDir) throws Exception {
+		sshUtil.rmdir(remoteDir)
+	}
+	void rmdir(SSHUtil sshUtil,String remoteDir,boolean recursive) throws Exception {
+		sshUtil.rmdir(remoteDir,recursive)
+	}
+	
+
 	String readRemoteFile(String remoteFile, Connection connection=null, boolean closeConnection=false) throws Exception {
 		if (!connection) {
 			connection=openConnection
@@ -229,6 +245,13 @@ class SshUtilService {
 		
 	}
 	
+	long putFile(SSHUtil sshUtil, String localFile, OutputStream out) {
+		sshUtil(localFile,out)
+	}
+	
+	void put(SSHUtil sshUtil,String localFile, String remoteFile) {
+		sshUtil.put(localFile,remoteFile)
+	}
 	/**
 	 * sshUtik.remoteDir=remoteDir
 	 * sshUtil.localFile=localFile
@@ -283,10 +306,61 @@ class SshUtilService {
 		}
 		getFiles(new SSHUtil(connection,closeConnection),files,localFolder)
 	}
+	
 	void getFiles(SSHUtil sshUtil,List<String> files, String localFolder) {
 		sshUtil.getFiles(files,localFolder) 
 	}
 	
+	boolean isNotHiddenFile(SSHUtil sshUtil, String strFileName) {
+		return sshUtil.isNotHiddenFile(strFileName)
+	}
+	
+	boolean isHiddenFile(SSHUtil sshUtil, String strFileName) {
+		return sshUtil.isHiddenFile(strFileName)
+	}
+	boolean isDirectory(SSHUtil sshUtil, String folderName) {
+		return sshUtil.isDirectory(folderName)
+	}
+	List<String> listNames(SSHUtil sshUtil, String pathname) {
+		return sshUtil.listNames(pathname)
+	}
+	
+	List<String> listFiles(SSHUtil sshUtil, String pathname, boolean recurseSubFolder) {
+		return sshUtil.listFiles(pathname,recurseSubFolder)
+	}
+	
+	List<String> listFiles(SSHUtil sshUtil) throws Exception {
+		return sshUtil.listFiles
+	}
+	List<String> getFileNames(SSHUtil sshUtil) throws Exception {
+		return sshUtil.fileNames
+	}
+	List<String> getFileNames(SSHUtil sshUtil,boolean recursive) throws Exception {
+		return sshUtil.getFileNames(recursive)
+	}
+	List<String> getFileNames(SSHUtil sshUtil, String pathname) {
+		return sshUtil.getFileNames(pathname)
+	}
+	
+	List<String> getFileNames(SSHUtil sshUtil, String pathname,boolean recursive) {
+		return sshUtil.getFileNames(pathname,recursive)
+	}
+	int cd(SSHUtil sshUtil, String strFolderName) {
+		return sshUtil.DoCD(strFolderName)
+	}
+	
+	boolean changeWorkingDirectory(SSHUtil sshUtil,String pathname) {
+		return sshUtil.changeWorkingDirectory(pathname)
+	}
+	List<String> dir(SSHUtil sshUtil) {
+		return sshUtil.dir()
+	}
+	List<String> dir(SSHUtil sshUtil, String strFolderName) {
+		return sshUtil.dir(strFolderName)
+	}
+	List<String> dir(SSHUtil sshUtil, String strFolderName, int flag) {
+		return sshUtil.dir(strFolderName,flag)
+	}
 	/**
 	 * Execute a command
 	 * @param cmd
@@ -335,6 +409,11 @@ class SshUtilService {
 	 */
 	boolean fileExists(SSHUtil sshUtil,String filename) {
 		return sshUtil.fileExists(filename)
+	}
+	
+	
+	void del(SSHUtil sshUtil, String remoteFile)  {
+		sshUtil.del(remoteFile)
 	}
 	
 	/**
