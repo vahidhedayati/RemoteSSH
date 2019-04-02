@@ -7,7 +7,7 @@ Grails RemoteSSH Plugin based on Ganymed SSH-2 library : Provides ( RemoteSSH + 
 Dependency Grails 2:
 
 ```groovy
-	compile ":remote-ssh:0.12"
+	compile ":remote-ssh:0.13"
 ```
 
 [Grails 2 source](https://github.com/vahidhedayati/RemoteSSH/tree/grails2)
@@ -15,21 +15,19 @@ Dependency Grails 2:
 Dependency Grails 3 (build.gradle):
 
 ```groovy
-	compile "org.grails.plugins:remotessh:3.0.7"
+	compile "org.grails.plugins:remotessh:3.0.8"
 ```
 [Grails 3 source](https://github.com/vahidhedayati/RemoteSSH)
 	
 
-Updates on 0.9 of grails 2 branch:
-----
-
-[How to use 0.9 revision](https://github.com/vahidhedayati/RemoteSSH/tree/grails2/revision-0.9.md)
-
-
-0.10 updates & 3.0.7+ on grails 3 branch
+0.10+ updates
 ---
 
-[How to use 0.10+  3.0.7+ revision](https://github.com/vahidhedayati/RemoteSSH/tree/grails2/revision-0.10.md)
+[How to use 0.13+ revision](https://github.com/vahidhedayati/RemoteSSH/tree/grails2/release-0.13.md)
+
+[How to use 0.10 - 0.13 revision](https://github.com/vahidhedayati/RemoteSSH/tree/grails2/revision-0.10.md)
+
+[How to use 0.9 revision](https://github.com/vahidhedayati/RemoteSSH/tree/grails2/revision-0.9.md)
 
 
 [Documentation for class usage](http://vahidhedayati.github.io/RemoteSSH/all-docs.html)

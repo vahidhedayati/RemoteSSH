@@ -1,20 +1,9 @@
 package grails.plugin.remotessh
 
+import ch.ethz.ssh2.*
 import grails.util.Holders
-
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
-
-import ch.ethz.ssh2.ChannelCondition
-import ch.ethz.ssh2.Connection
-import ch.ethz.ssh2.SCPClient
-import ch.ethz.ssh2.SCPInputStream
-import ch.ethz.ssh2.SFTPException
-import ch.ethz.ssh2.SFTPv3Client
-import ch.ethz.ssh2.SFTPv3FileAttributes
-import ch.ethz.ssh2.SFTPv3FileHandle
-import ch.ethz.ssh2.Session
-import ch.ethz.ssh2.StreamGobbler
 
 /**
  *
@@ -30,12 +19,14 @@ import ch.ethz.ssh2.StreamGobbler
 
 class SSHUtil {
 
+    protected String reply="OK"
+    private String currentDirectory=""
     private static final Logger log = LoggerFactory.getLogger(this.class)
     private static final int BUFSIZE = 1024
 
     public static final int S_IFMT = 0170000 // bitmask for the file type bitfields
     public static final int S_IFDIR = 0040000 // directory
-
+    private String FS = System.getProperty("file.separator")
     Connection connection
     SFTPv3Client client
     SCPClient scpClient
@@ -131,6 +122,81 @@ class SSHUtil {
     }
 
 
+    /**
+     * Creates a new subdirectory on the FTP server in the current directory .
+     * @param pstrPathName The pathname of the directory to create.
+     * @return True if successfully completed, false if not.
+     * @throws java.lang.IOException
+     */
+
+    void mkdir(final String pstrPathName) {
+        try {
+            reply = "mkdir OK"
+            String strPath = ""
+            if (pstrPathName.startsWith(FS)) {
+                strPath = FS
+            }
+            String[] strP = pstrPathName.split(FS)
+            for (String strSubFolder : strP) {
+                if (strSubFolder.trim().length() > 0) {
+                    strPath += strSubFolder + FS
+                    SFTPv3FileAttributes objFA
+                    try {
+                        objFA = client.lstat(strPath)
+                    }
+                    catch (Exception e) {
+                        objFA = null;
+                    }
+                    //&& client.lstat(strPath).isDirectory() == false
+                    if (!objFA) {
+                        client.mkdir(strPath, 484)
+                        log.debug("[mkdir]"+ strPath)
+                    }
+                }
+            }
+        } catch (IOException e) {
+            throw new Exception("makeDirectory()", e);
+        }
+        finaliseConnection()
+    }
+
+    /**
+     * Removes a directory on the FTP server (if empty).
+     * @param pathname The pathname of the directory to remove.
+     * @throws java.lang.IOException
+     */
+
+    void rmdir(String pstrPathName, boolean recursive=true) throws IOException {
+        try {
+            String[] strP = pstrPathName.split(FS);
+            reply = "rmdir OK";
+            if (strP) {
+                int p=0
+                for (int i = strP.length; i > 0; i--) {
+
+                    String strT = "";
+                    for (int j = 0; j < i; j++) {
+                        strT += strP[j] + FS;
+                    }
+                    if ((!recursive && p==0||recursive)  && client.lstat(strT).isDirectory()) {
+                        log.debug("[rmdir]"+ strT)
+                        client.rmdir(strT)
+                    }
+                    p++
+                }
+            }
+        } catch (Exception e) {
+            //log.error ("removeDirectory()", e)
+            throw new Exception("removeDirectory()", e)
+        }
+        finaliseConnection()
+    }
+
+    /**
+     * Reads string content of remote file
+     * @return
+     * @throws Exception
+     */
     String readRemoteFile(String givenFile=null) throws Exception {
         StringBuffer resultBuffer = new StringBuffer()
         remoteFile=givenFile?:remoteFile
@@ -141,28 +207,29 @@ class SSHUtil {
             while ((data = bufferedReader.readLine()) != null) {
                 resultBuffer.append(data + "\n")
             }
-            finaliseConnection()
         }
+        finaliseConnection()
         return resultBuffer.toString()
     }
 
     String readFile(String givenFile=null) throws Exception {
+        byte[] bs = new byte[11]
         remoteFile=givenFile?:remoteFile
         if (remoteFile) {
             handle =client.openFileRO(remoteFile)
-            byte[] bs = new byte[11]
             int i = 0
             long offset = 0
             while (i != -1) {
                 i = client.read(handle, offset, bs, 0, bs.length)
                 offset += i
             }
-            finaliseConnection()
-            return new String(bs)
+
         }
+        finaliseConnection()
+        return new String(bs)
     }
 
-    void initialiseRemoteFile(String localfile=null, String remotedir=null, boolean overrideRemoteFile=false) {
+    private void initialiseRemoteFile(String localfile=null, String remotedir=null, boolean overrideRemoteFile=false) {
         this.localFile=localfile?localfile:localFile
         if (localFile) {
             this.actualFile = new File(localFile)
@@ -186,32 +253,51 @@ class SSHUtil {
                 out.write(cache, 0, i)
                 offset += i
             }
-            finaliseConnection()
         }
+        finaliseConnection()
     }
 
-    void createRemoteDirs(String remotedir=null) throws Exception {
+    void getMkDirs()  throws Exception {
+        createRemoteDirs()
+    }
+    void mkDirs(String remotedir=null)  throws Exception {
+        createRemoteDirs(remotedir?:remoteDir)
+    }
+
+    void createRemoteDirs(String remotedir=null)  {
         String path = remotedir?remotedir:remoteDir
         if (path) {
-            String FS = System.getProperty("file.separator");
-            int index = path.lastIndexOf(FS);
-            if (index > 1) {
-                createRemoteDirs(path.substring(0, index));
-            }
             try {
-                SFTPv3FileAttributes attribs = client.stat(path);
-                if (!((attribs.permissions & S_IFDIR) == S_IFDIR)) {
-                    throw new IOException(path + " is not a folder");
+                int index = path.lastIndexOf(FS);
+                if (index > 1) {
+                    createRemoteDirs(path.substring(0, index))
                 }
-            } catch (SFTPException e) {
-                client.mkdir(path, 0777);
-                log.debug("Remote folder created " + path);
-            } catch (Exception e) {
+                SFTPv3FileAttributes attribs
+                try {
+                    attribs = client.stat(path)
+                    if (!((attribs.permissions & S_IFDIR) == S_IFDIR)) {
+                        throw new IOException(path + " is not a folder")
+                    }
+                    //} catch (SFTPException e) {
+                    //	attribs=null
+                } catch (Exception e) {
+                    attribs=null
+                }
+                if (!attribs) {
+                    client.mkdir(path, 0777)
+                    log.debug("Remote folder created " + path)
+                }
+
+            } catch (IOException e) {
+                log.debug("createRemoteDirs()", e)
+                throw new Exception("createRemoteDirs()", e);
             }
+
         }
+        finaliseConnection()
     }
 
-    long remoteFileSize(String remotefile=null) throws Exception {
+    long remoteFileSize(String remotefile=null) {
         long lngFileSize = -1;
         remoteFile=remotefile?:remoteFile
         if (remoteFile) {
@@ -222,33 +308,36 @@ class SSHUtil {
                 }
             } catch (SFTPException e) {
             }
-            finaliseConnection()
         }
+        finaliseConnection()
         return lngFileSize
     }
 
     void writeFileWithName(String localfile=null, String remotefile=null) throws Exception {
         this.remoteFile=remotefile?:remoteFile
-        initialiseRemoteFile(localfile,remotefile)
-        if (remoteFile && localFile) {
-            File actualFile = new File(localFile)
-            createRemoteDirs(remoteFile)
-            SFTPv3Client sftPv3Client = new SFTPv3Client(connection)
-            if (characterSet) {
-                sftPv3Client.setCharset(characterSet)
+        try {
+            initialiseRemoteFile(localfile,remotefile)
+            if (remoteFile && localFile) {
+                File actualFile = new File(localFile)
+                if (remoteFile.contains(FS)) {
+                    createRemoteDirs(remoteFile?.substring(0,remoteFile.lastIndexOf(FS)))
+                }
+
+                client.createFile(remoteFile)
+                handle = client.openFileWAppend(remoteFile)
+                byte[] bytesArray = new byte[(int) actualFile.length()]
+                FileInputStream fileInputStream  = new FileInputStream(actualFile)
+                fileInputStream.read(bytesArray)
+                fileInputStream.close()
+                client.write(handle, 0, bytesArray, 0, bytesArray.length)
+                finaliseConnection()
             }
-            sftPv3Client.createFile(remoteFile)
-            handle = sftPv3Client.openFileWAppend(remoteFile)
-            byte[] bytesArray = new byte[(int) actualFile.length()]
-            FileInputStream fileInputStream  = new FileInputStream(actualFile)
-            fileInputStream.read(bytesArray)
-            fileInputStream.close()
-            sftPv3Client.write(handle, 0, bytesArray, 0, bytesArray.length)
-            finaliseConnection()
+        } catch (Exception e) {
+            throw new Exception(e)
         }
     }
 
-    void getFile(String remotefile=null, String localdir=null, boolean recursive=false) throws Exception {
+    void getFile(String remotefile=null, String localdir=null, boolean recursive=false)  {
         this.remoteFile=remotefile?remotefile:remoteFile
         String fileName
         if (remoteFile) {
@@ -287,20 +376,340 @@ class SSHUtil {
         }
         finaliseConnection()
     }
-    void putFile(String localfile=null, String remotedir=null, boolean recursive=false) throws Exception {
+
+    boolean isNotHiddenFile(String strFileName) {
+        return !isHiddenFile(strFileName);
+    }
+
+    boolean isHiddenFile(String pstrFolderName) {
+        boolean flgR
+        if (pstrFolderName.endsWith("..") == true || pstrFolderName.endsWith(".") == true) {
+            flgR = true
+        }
+        return flgR
+    }
+
+    List<String> listFiles(String pathname, boolean recurseSubFolder) {
+        try {
+            return getFileNames(pathname, recurseSubFolder)
+        } catch (Exception e) {
+            throw new Exception("getfilenames() listFiles", e)
+        }
+    }
+
+    /**
+     * return a listing of the contents of a directory in short format on
+     * the remote machine
+     *
+     * @return a listing of the contents of a directory on the remote machine
+     *
+     * @exception Exception
+     * @see #nList( String )
+     * @see #dir()
+     * @see #dir( String )
+     */
+    List<String> getLs() throws Exception {
+        return getFileNames()
+    }
+    List<String> getListFiles() throws Exception {
+        return getFileNames()
+    }
+    List<String> listFiles() throws Exception {
+        return getFileNames()
+    }
+
+    /**
+     * return a listing of the contents of a directory in short format on
+     * the remote machine (without subdirectory)
+     *
+     * @return a listing of the contents of a directory on the remote machine
+     *
+     * @exception Exception
+     * @see #nList( String )
+     * @see #dir()
+     * @see #dir( String )
+     */
+    List<String> getFileNames() throws Exception {
+        return getFileNames("", false);
+    }
+
+    List<String> getFileNames(boolean recurseSubFolders) throws Exception {
+        return getFileNames("", recurseSubFolders)
+    }
+
+    /**
+     * return a listing of the contents of a directory in short format on
+     * the remote machine
+     *
+     * @return a listing of the contents of a directory on the remote machine
+     *
+     * @exception Exception
+     * @see #nList( String )
+     * @see #dir()
+     * @see #dir( String )
+     */
+
+    List<String> listFiles(final boolean recursive) throws Exception {
+        return getFileNames(recursive)
+    }
+
+    List<String> listFiles(String pathname) {
+        return getFileNames(pathname)
+    }
+
+    List<String> getFileNames(String pathname) {
+        List<String> vecT
+        try {
+            vecT = getFileNames(pathname, false)
+        } catch (Exception e) {
+            throw new Exception("getFileNames()", e)
+        }
+        return vecT
+    }
+
+    List<String> getFileNames(String pstrPathName, boolean recurseSubFolders) throws Exception {
+        String strCurrentDirectory
+        List<String> vecDirectoryListing=[]
+        if (!vecDirectoryListing) {
+            vecDirectoryListing = []
+            String[] fileList = null
+            String lstrPathName = pstrPathName?.trim()
+            if (lstrPathName.length() <= 0) {
+                lstrPathName = ".";
+            }
+            if (1 == 1) {
+                try {
+                    fileList = listNames(lstrPathName);
+                }
+                catch (IOException e) {
+                    e.printStackTrace(System.err);
+                }
+            }
+
+            if (!fileList) {
+                return vecDirectoryListing;
+            }
+
+            for (String strCurrentFile : fileList) {
+                if (isNotHiddenFile(strCurrentFile)) {
+                    if (client.lstat(strCurrentFile).isDirectory() == false) {
+                        if (lstrPathName.startsWith(FS) == false) {
+                            if (strCurrentFile && strCurrentDirectory && strCurrentFile.startsWith(strCurrentDirectory) == false) {
+                                strCurrentFile = addFileSeparator(strCurrentDirectory) + strCurrentFile
+                            }
+                        }
+                        vecDirectoryListing.add(strCurrentFile)
+                    }
+                    else {
+                        if (recurseSubFolders) {
+                            log.debug("start scan for subdirectory "+ strCurrentFile)
+                            Vector<String> vecNames = getFileNames(strCurrentFile, recurseSubFolders)
+                            if (vecNames != null) {
+                                vecDirectoryListing.addAll(vecNames)
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        return vecDirectoryListing;
+    }
+
+    int DoCD(String strFolderName) {
+        int x = 0
+        try {
+            x = cd(strFolderName)
+        } catch (IOException e) {
+        }
+        return x
+    }
+    private String trimResponseCode(final String response) throws Exception {
+        if (response.length() < 5)
+            return response;
+        return response.substring(4).trim()
+    }
+    List<String> getDir() {
+        return dir()
+    }
+    List<String> dir() {
+        try {
+            return dir("")
+        } catch (Exception e) {
+            throw new RuntimeException("dir", e);
+        }
+    }
+
+    List<String>  dir(String pathname) {
+        return getFileNames(pathname)
+    }
+    List<String> dir(String pathname, int flag) {
+        List<String> fileList = []
+        String[] listFiles = null;
+        try {
+            listFiles = this.listNames(pathname);
+        }
+        catch (IOException e) {
+            throw new Exception("listfiles() dir")
+        }
+        if (listFiles != null) {
+            for (String listFile : listFiles) {
+                if (flag > 0 && isDirectory(listFile)) {
+                    fileList.addAll(this.dir(pathname + FS + listFile, flag >= 1024 ? flag : flag + 1024));
+                }
+                else {
+                    if (flag >= 1024) {
+                        fileList.add(pathname + FS + listFile.toString());
+                    }
+                    else {
+                        fileList.add(listFile.toString());
+                    }
+                }
+            }
+        }
+        return fileList;
+    }
+
+    // private int DoCD
+    int cd(String directory) throws IOException {
+        changeWorkingDirectory(directory);
+        return 1
+    }
+
+    boolean changeWorkingDirectory(String pathname) throws IOException {
+        pathname = resolvePathname(pathname);
+        // cut trailing "/" if it's not the only character
+        if (pathname.length() > 1 && pathname.endsWith(FS))
+            pathname = pathname.substring(0, pathname.length() - 1);
+        if (!fileExists(pathname)) {
+            reply = "\"" + pathname + "\" doesn't exist."
+            return false
+        }
+        if (!isDirectory(pathname)) {
+            reply = "\"" + pathname + "\" is not a directory."
+            return false
+        }
+        if (pathname.startsWith(FS) || currentDirectory.length() == 0) {
+            currentDirectory = pathname
+            reply = "cd OK"
+            return true
+        }
+        currentDirectory = pathname
+        reply = "cd OK"
+        return true
+    }
+
+    private String resolvePathname(final String pathname) {
+        String strR = pathname;
+        if (!pathname.startsWith("./") && !pathname.startsWith("/") && currentDirectory.length() > 0) {
+            String slash = ""
+            if (!currentDirectory.endsWith("/"))
+                slash = "/"
+            strR = currentDirectory + slash + pathname
+        }
+        while (pathname.contains("\\")) {
+            strR = pathname.replace('\\', '/')
+        }
+        if (strR.endsWith("/")) {
+            strR = strR.substring(0, strR.length() - 1)
+        }
+        return strR;
+    }
+
+    boolean isDirectory(final String filename) {
+        try {
+            return client.stat(filename).isDirectory()
+        }
+        catch (Exception e) {
+        }
+        return false
+    }
+
+    List<String> listNames(String pathname) throws IOException {
+        pathname = resolvePathname(pathname)
+        try {
+            if (pathname.length() == 0) {
+                pathname = "."
+            }
+
+            //if (!fileExists(pathname)) {
+            //	return null
+            //}
+
+            if (!isDirectory(pathname)) {
+                File remoteFile = new File(pathname)
+                reply = "ls OK";
+                return  [remoteFile.getName()]
+            }
+            Vector<SFTPv3DirectoryEntry> files = client.ls(pathname)
+            List<String> rvFiles = []
+
+            for (int i = 0; i < files.size(); i++) {
+                SFTPv3DirectoryEntry entry = files.get(i)
+                rvFiles << addFileSeparator(pathname) + entry.filename
+            }
+            reply = "ls OK"
+            return rvFiles
+        } catch (Exception e) {
+            reply = e.toString()
+            return null
+        }
+    }
+    SFTPv3FileHandle openFileWR(final String pstrFilename) throws Exception {
+        SFTPv3FileHandle sftpFileHandle = null;
+        String sourceLocation = resolvePathname(pstrFilename)
+        try {
+            //	sftpFileHandle = objFTPClient.createFile(pstrFilename);
+            sftpFileHandle = client.createFileTruncate(sourceLocation);
+
+        }
+        catch (Exception e) {
+            throw new Exception("opening file [" + sourceLocation + "]", e.getMessage())
+        } finally {
+        }
+        return sftpFileHandle
+    }
+
+    SFTPv3FileHandle openFileRO(final String pstrFilename) throws Exception {
+        String sourceLocation = resolvePathname(pstrFilename)
+        SFTPv3FileHandle sftpFileHandle = null
+        try {
+            sftpFileHandle = client.openFileRO(sourceLocation)
+        }
+        catch (Exception e) {
+            throw new Exception("opening file [" + sourceLocation + "]", e.getMessage());
+        } finally {
+        }
+        return sftpFileHandle
+    }
+
+    void put(String localFile, String remoteFile) {
+
+        try {
+            long lngBytesWritten = this.putFile(localFile, remoteFile);
+        }
+        catch (Exception e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+    }
+
+    long putFile(String localfile=null, String remotedir=null, boolean recursive=false) throws Exception {
+
+        int count = 0
         initialiseRemoteFile(localfile,remotedir,true)
         if (remoteDir && remoteFile && localFile) {
+            remoteFile = resolvePathname(remoteFile);
             createRemoteDirs(remoteDir)
-            client.createFile(remoteFile);
-            handle = client.openFileRW(remoteFile);
-            BufferedInputStream is = new BufferedInputStream(new FileInputStream(localFile));
-            byte[] buf = new byte[BUFSIZE];
-            int count = 0;
-            int bufsiz = 0;
+            client.createFile(remoteFile)
+            handle = client.openFileRW(remoteFile)
+            BufferedInputStream is = new BufferedInputStream(new FileInputStream(localFile))
+            byte[] buf = new byte[BUFSIZE]
+
+            int bufsiz = 0
             while ((bufsiz = is.read(buf)) != -1) {
                 //here the writing is made on the remote file
-                client.write(handle, (long) count, buf, 0, bufsiz);
-                count += bufsiz;
+                client.write(handle, (long) count, buf, 0, bufsiz)
+                count += bufsiz
             }
             is.close()
             if (!recursive) {
@@ -309,7 +718,37 @@ class SSHUtil {
                 closeHandle()
             }
         }
+        return count
     }
+
+    long putFile(final String localFile, final OutputStream out) {
+        FileInputStream input
+        long lngTotalBytesWritten = 0
+        try {
+            byte[] buffer = new byte[4096]
+            input = new FileInputStream(new File(localFile))
+            // TODO get progress info
+            int bytesWritten
+            synchronized (this) {
+                while ((bytesWritten = input.read(buffer)) != -1) {
+                    out.write(buffer, 0, bytesWritten)
+                    lngTotalBytesWritten += bytesWritten
+                }
+            }
+            input.close()
+            out.close()
+            return lngTotalBytesWritten;
+        }
+        catch (Exception e) {
+            throw new Exception("putFile()",e);
+        }
+        finally {
+            input.close()
+            out.close()
+        }
+        return lngTotalBytesWritten;
+    }
+
     void putFiles(List<String> localFilePaths, String remotefolder=null) {
         this.remoteDir=remotefolder?:remoteDir
         if (this.remoteDir) {
@@ -321,7 +760,9 @@ class SSHUtil {
             finaliseConnection()
         }
     }
-
+    public String addFileSeparator(final String str) {
+        return str.endsWith("/") || str.endsWith("\\") ? str : str + "/";
+    }
 
     String execute(String command=null) throws Exception {
         this.cmd=command?:cmd
@@ -356,6 +797,9 @@ class SSHUtil {
         return buffer.toString()
     }
 
+    void del(String pathName)  {
+        deleteRemoteFile(pathName)
+    }
     void deleteRemoteFile(String pathName) throws IOException {
         if (fileExists(pathName)) {
             client.rm(pathName)
@@ -429,7 +873,10 @@ class SSHUtil {
         }
     }
 
-
+    String getDisconnect() {
+        disconnect()
+        return ''
+    }
     void disconnect() {
         finaliseConnection(true)
     }
