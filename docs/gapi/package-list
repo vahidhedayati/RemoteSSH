@@ -1,3 +1,4 @@
 DefaultPackage
 grails.plugin.remotessh
+grails.plugin.remotessh.executor
 ssh

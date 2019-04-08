@@ -821,10 +821,188 @@ class SSHUtil {
             } catch (Exception e) {
                 state=false;
             }
-            finaliseConnection()
         }
+        finaliseConnection()
         return state
     }
+
+    Date getModificationDateTime(String strFileName) {
+        Date dt
+        try {
+            handle = client.openFileRO(strFileName)
+            dt=new Date(client.fstat(handle).atime*1000L)
+        } catch (IOException e) {
+            // e.printStackTrace();
+        }
+        finaliseConnection()
+        return dt
+    }
+
+    long setModificationDateTime(String file, long pdteDateTime) {
+        long lngR = 0
+        try {
+            handle = client.openFileRW(file)
+            SFTPv3FileAttributes objFA = client.fstat(handle)
+            //objFA.mtime = new Integer((int) pdteDateTime /1000L)
+            objFA.atime = new Integer((int) pdteDateTime/1000L)
+
+            client.fsetstat(handle,objFA)
+            client.closeFile(handle)
+            lngR = pdteDateTime
+        } catch (IOException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace()
+        }
+        finaliseConnection()
+        return lngR
+    }
+
+    void setModificationDateTime(String file, Date date) {
+        try {
+            handle = client.openFileRW(file)
+            SFTPv3FileAttributes objFA = client.fstat(handle)
+            //objFA.mtime = (date.getTime()/1000L).intValue()
+            objFA.atime = (date.getTime()/1000L).intValue()
+            client.fsetstat(handle,objFA)
+            client.closeFile(handle)
+        } catch (IOException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace()
+        }
+        finaliseConnection()
+    }
+
+    Integer getFilePermission(String strFileName) {
+        Integer permission
+        try {
+            handle = client.openFileRO(strFileName)
+            //permission=client.fstat(handle).permissions
+            String op = client.fstat(handle).octalPermissions
+            permission=op.substring(4,op.length()) as int
+        } catch (IOException e) {
+            // e.printStackTrace();
+        }
+        finaliseConnection()
+        return permission
+    }
+
+    String getPermission(String strFileName=null) {
+        if (!strFileName)  strFileName=remoteFile
+        String permission
+        try {
+            handle = client.openFileRO(strFileName)
+            String op = client.fstat(handle).octalPermissions
+            permission=splitPermission(op.substring(4,op.length()))
+        } catch (IOException e) {
+            // e.printStackTrace();
+        }
+        finaliseConnection()
+        return permission
+    }
+
+    String getOctalPermission(String strFileName=null) {
+        if (!strFileName)  strFileName=remoteFile
+        String permission
+        try {
+            handle = client.openFileRO(strFileName)
+            permission= client.fstat(handle).octalPermissions
+        } catch (IOException e) {
+            // e.printStackTrace();
+        }
+        finaliseConnection()
+        return permission
+    }
+    int getDecimalPermission(String strFileName=null) {
+        if (!strFileName)  strFileName=remoteFile
+        int permission
+        try {
+            handle = client.openFileRO(strFileName)
+            permission= client.fstat(handle).permissions
+        } catch (IOException e) {
+            // e.printStackTrace();
+        }
+        finaliseConnection()
+        return permission
+    }
+
+    String getBinaryPermission(String strFileName=null) {
+        if (!strFileName)  strFileName=remoteFile
+        String permission
+        try {
+            handle = client.openFileRO(strFileName)
+            permission = Integer.toBinaryString(client.fstat(handle).permissions)
+        } catch (IOException e) {
+            // e.printStackTrace();
+        }
+        finaliseConnection()
+        return permission
+    }
+
+    String getFileUserId(String strFileName) {
+        String uid
+        try {
+            handle = client.openFileRO(strFileName)
+            uid=client.fstat(handle).uid
+            //permission=octalToBinary(client.stat(strFileName).permissions)
+        } catch (IOException e) {
+            // e.printStackTrace();
+        }
+        finaliseConnection()
+        return uid
+    }
+
+
+    String splitPermission(String line) {
+        String[] nums = line.split("");
+        StringBuilder sb = new StringBuilder()
+        nums.findAll{it}?.each { s->
+            if (sb.length() > 0) sb.append(" ")
+            int num = Integer.parseInt(s)
+            sb.append((num & 4) == 0 ? '-' : 'r')
+            sb.append((num & 2) == 0 ? '-' : 'w')
+            sb.append((num & 1) == 0 ? '-' : 'x')
+        }
+        log.debug("Permission ${line} = ${sb.toString()}")
+        return sb.toString()
+    }
+
+    void setFilePermission(String strFileName, int newPermission) {
+        try {
+            handle = client.openFileRW(strFileName)
+            SFTPv3FileAttributes objFA = client.fstat(handle)
+            //FileMode fm = new FileMode(newPermission.toString())
+            int decimal=Integer.parseInt("0100${newPermission.toString()}",8)
+            objFA.permissions=decimal
+            client.fsetstat(handle,objFA)
+            client.closeFile(handle)
+        }
+        catch (IOException e) {
+            // e.printStackTrace();
+        }
+        finaliseConnection()
+    }
+
+
+    void setFilePermission(String strFileName, String newPermission) {
+        try {
+            handle = client.openFileRW(strFileName)
+            SFTPv3FileAttributes objFA = client.fstat(handle)
+            //FileMode fm = new FileMode(newPermission.toString())
+            int decimal=Integer.parseInt(newPermission.startsWith("0100") ? newPermission : '0100'+newPermission,8)
+            objFA.permissions=decimal
+            client.fsetstat(handle,objFA)
+            client.closeFile(handle)
+        }
+        catch (IOException e) {
+            // e.printStackTrace();
+        }
+        finaliseConnection()
+    }
+
+    long fileSize(String remotefile=null) {
+        return remoteFileSize(remotefile)
+    }
+
 
     //---------------------- STATIC METHODS BELOW -------------------------//
     /**
@@ -947,7 +1125,7 @@ class SSHUtil {
         }
         return client
     }
-
+    
     /**
      * 0.11 customised to lookup internal configVariable meaning default remotessh config key
      * can be overridden demonstrated in release-0.10.md
