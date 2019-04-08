@@ -1,11 +1,17 @@
 package grails.plugin.remotessh
 
+import grails.plugin.remotessh.executor.Priority
+import grails.plugin.remotessh.executor.SshRunnable
+
+import java.util.concurrent.RunnableFuture
+
 import ch.ethz.ssh2.Connection
 import ch.ethz.ssh2.SCPClient
 import ch.ethz.ssh2.SFTPv3Client
 
 class SshUtilService {
 	def grailsApplication
+	def sshExecutor
 	
 	
 	/**
@@ -451,6 +457,38 @@ class SshUtilService {
 		return sshUtil.remoteFileSize(remoteFile)
 	}
 
+	def threadedExecutor(Closure closure) {
+		SshRunnable currentTask = new SshRunnable(closure)
+		RunnableFuture task = sshExecutor.execute(currentTask, Priority.LOW.value)
+		return task?.get()
+	}
+	def threadedExecutor(Closure closure,Priority priority) {
+		SshRunnable currentTask = new SshRunnable(closure)
+		RunnableFuture task = sshExecutor.execute(currentTask, priority.value)
+		return task?.get()
+	}
+	def threadedExecutor(SSHUtil sshUtil, Closure closure) {
+		SshRunnable currentTask = new SshRunnable(sshUtil,sshUtil.connection,closure)
+		RunnableFuture task = sshExecutor.execute(currentTask, Priority.LOW.value)
+		return task?.get()
+	}
+	
+	def threadedExecutor(SSHUtil sshUtil, Priority priority, Closure closure) {
+		SshRunnable currentTask = new SshRunnable(sshUtil,sshUtil.connection,closure)
+		RunnableFuture task = sshExecutor.execute(currentTask, priority.value)
+		return task?.get()
+	}
+	def threadedExecutor(SSHUtil sshUtil, Connection connection,  Closure closure) {
+		SshRunnable currentTask = new SshRunnable(sshUtil,connection,closure)
+		RunnableFuture task = sshExecutor.execute(currentTask,  Priority.LOW.value)
+		return task?.get()
+	}
+	def threadedExecutor(SSHUtil sshUtil, Connection connection, Priority priority, Closure closure) {
+		SshRunnable currentTask = new SshRunnable(sshUtil,connection,closure)
+		RunnableFuture task = sshExecutor.execute(currentTask, priority.value)
+		return task?.get()
+	}
+	
 	void disconnect(SSHUtil sshUtil) {
 		sshUtil.disconnect()
 	}
@@ -471,7 +509,7 @@ class SshUtilService {
 		sshUtil.client=sc
 		createRemoteDirs(sshUtil,path)
 	}
-	
+
 	/**
 	 * createRemoteDirs remotely
 	 * @param sshUtil

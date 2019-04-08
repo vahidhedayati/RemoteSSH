@@ -7,7 +7,7 @@ Grails RemoteSSH Plugin based on Ganymed SSH-2 library : Provides ( RemoteSSH + 
 Dependency Grails 2:
 
 ```groovy
-	compile ":remote-ssh:0.13"
+	compile ":remote-ssh:0.14"
 ```
 
 [Grails 2 source](https://github.com/vahidhedayati/RemoteSSH/tree/grails2)
@@ -15,58 +15,29 @@ Dependency Grails 2:
 Dependency Grails 3 (build.gradle):
 
 ```groovy
-	compile "org.grails.plugins:remotessh:3.0.8"
+	compile "org.grails.plugins:remotessh:3.0.9"
 ```
 [Grails 3 source](https://github.com/vahidhedayati/RemoteSSH)
 
 
-0.10+ updates
+Documentation
 ---
 
-[How to use 0.13+ revision](https://github.com/vahidhedayati/RemoteSSH/tree/grails2/release-0.13.md)
+[How to use latest revision](https://github.com/vahidhedayati/RemoteSSH/docs/release-0.14.md)
 
-[How to use 0.10 - 0.13 revision](https://github.com/vahidhedayati/RemoteSSH/tree/grails2/revision-0.10.md)
+[How to use older revisions](https://github.com/vahidhedayati/RemoteSSH/docs/index.md)
 
-[How to use 0.9 revision](https://github.com/vahidhedayati/RemoteSSH/tree/grails2/revision-0.9.md)
+[Configuration variables](https://github.com/vahidhedayati/RemoteSSH/docs/config.md)
 
+[SSHUtil methods and how to use](http://vahidhedayati.github.io/RemoteSSH/gapi/grails/plugin/remotessh/SSHUtil.html)
 
-[Documentation for class usage](http://vahidhedayati.github.io/RemoteSSH/all-docs.html)
+[SshUtilService methods and how to use](http://vahidhedayati.github.io/RemoteSSH/gapi/grails/plugin/remotessh/SshUtilService.html)
 
-
-[SSHUtil](http://vahidhedayati.github.io/RemoteSSH/gapi/grails/plugin/remotessh/SSHUtil.html)
-
-
-[SshUtilService](http://vahidhedayati.github.io/RemoteSSH/gapi/grails/plugin/remotessh/SshUtilService.html)
+[Documentation for classes within plugin: methods/usage](http://vahidhedayati.github.io/RemoteSSH/all-docs.html)
 
 
 
-	
-#### For websocket live ssh connection / interaction: 
-Check out : [jssh](https://github.com/vahidhedayati/jssh)
-
-
-# Config.groovy variables required:
-
-Configure SSH and SCP by adding properties to grails-app/conf/Config.groovy under the "remotessh" key:
-```groovy
-//Option set a global username to access ssh through to remote host
-//If you are going to define user from above commands then leave it with empty speach marks
-remotessh.USER = "USER"
-
-//The password leave blank if you are about to use SSH Keys, otherwise provide password to ssh auth
-remotessh.PASS=""
-
-//The ssh key is your id_rsa or id_dsa - please note your tomcat will need access/permissions to file/location
-remotessh.KEY="/home/youruser/.ssh/id_rsa"
-
-//If you use a key pass for your key connections then provide it below
-remotessh.KEYPASS=""
-
-//The ssh port to connect through if not given will default to 22
-remotessh.PORT="22"
-```
-
-Please refer to [How to use 0.10+ revision](https://github.com/vahidhedayati/RemoteSSH/tree/grails2/revision-0.10.md) to find out how to override the configuration key variable with SSHUtil 
+###  [Youtube video walking through 0.14+](https://www.youtube.com/watch?v=-Cjpj1LLI4k)
 
 ### [Youtube video walking through 0.3](https://www.youtube.com/watch?v=v_0nNJX4Xmk)
 
@@ -86,9 +57,12 @@ Please refer to [How to use 0.10+ revision](https://github.com/vahidhedayati/Rem
 
 #### [Shell script example:](https://github.com/vahidhedayati/RemoteSSH/wiki/shell-script-example)
 
-## [Demo site grails 2.4.4 remote-ssh:0.3](https://github.com/vahidhedayati/test-rssh)
+## [Demo site grails 2.4.4 remote-ssh:0.14](https://github.com/vahidhedayati/test-rssh)
 ## [Demo site grails 3.0.1 remote-ssh:3.0.1](https://github.com/vahidhedayati/testrssh)
 
+	
+#### For websocket live ssh connection / interaction: 
+Check out : [jssh](https://github.com/vahidhedayati/jssh)
 
 
 

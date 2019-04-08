@@ -1,4 +1,6 @@
 import grails.plugin.remotessh.SshConfig
+import grails.plugin.remotessh.executor.ScheduledSshExecutor
+import grails.plugin.remotessh.executor.SshExecutor
 
 class RemoteSshGrailsPlugin {
 	def version = "0.13"
@@ -13,6 +15,8 @@ class RemoteSshGrailsPlugin {
 	def scm = [url: 'https://github.com/vahidhedayati/RemoteSSH']
 
 	def doWithSpring = {
+		sshExecutor(SshExecutor)
+		scheduledSshExecutor(ScheduledSshExecutor)
 		sshConfig(SshConfig) {
 			grailsApplication = ref('grailsApplication')
 		}
