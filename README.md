@@ -1,7 +1,7 @@
 RemoteSSH
 =========
 
-Grails RemoteSSH Plugin based on Ganymed SSH-2 library : Provides ( RemoteSSH + exec command ) (RemoteSCP) (RemoteSCPDir) (RemoteSCPGet)
+Grails RemoteSSH Plugin based on Ganymed SSH-2 library 
 
 
 Dependency Grails 2:
@@ -23,9 +23,7 @@ Dependency Grails 3 (build.gradle):
 Documentation
 ---
 
-[How to use latest revision](https://github.com/vahidhedayati/RemoteSSH/docs/release-0.14.md)
-
-[How to use older revisions](https://github.com/vahidhedayati/RemoteSSH/docs/index.md)
+[How to use latest revision](https://github.com/vahidhedayati/RemoteSSH/blob/master/docs/revisions/release-0.14.md)
 
 [Configuration variables](https://github.com/vahidhedayati/RemoteSSH/docs/config.md)
 
@@ -33,48 +31,19 @@ Documentation
 
 [SshUtilService methods and how to use](http://vahidhedayati.github.io/RemoteSSH/gapi/grails/plugin/remotessh/SshUtilService.html)
 
-[Documentation for classes within plugin: methods/usage](http://vahidhedayati.github.io/RemoteSSH/all-docs.html)
+[Groovy Docs for classes within plugin: methods/usage](http://vahidhedayati.github.io/RemoteSSH/gapi/index.html)
 
+[Java Docs for classes within plugin: methods/usage](http://vahidhedayati.github.io/RemoteSSH/api/index.html)
 
 
 ###  [Youtube video walking through 0.14+](https://www.youtube.com/watch?v=-Cjpj1LLI4k)
 
-### [Youtube video walking through 0.3](https://www.youtube.com/watch?v=v_0nNJX4Xmk)
-
-#### [older method TestController calling RemoteSSH Grails 2](https://github.com/vahidhedayati/RemoteSSH/wiki/older-method)
-
-#### [older method TestController calling RemoteSSH Grails 3](https://github.com/vahidhedayati/RemoteSSH/wiki/older-method-grails3)
-
-#### [0.3+ gsp taglib call : run remote command ](https://github.com/vahidhedayati/test-rssh/blob/master/grails-app/controllers/test/rssh/TestController.groovy#L21-L26)
-
-#### [0.3+ gsp taglib call : remote SCP Directory ](https://github.com/vahidhedayati/test-rssh/blob/master/grails-app/views/test/scpDir.gsp)
-
-#### [0.3+ gsp taglib call : remote SCP File ](https://github.com/vahidhedayati/test-rssh/blob/master/grails-app/views/test/scpFile.gsp)
-
-#### [0.3+ gsp taglib call : remote SCP Get File ](https://github.com/vahidhedayati/test-rssh/blob/master/grails-app/views/test/scpGet.gsp)
-
-#### [0.3+ gsp taglib call : run remote command + reuse connection ](https://github.com/vahidhedayati/test-rssh/blob/master/grails-app/controllers/test/rssh/TestController.groovy#L52-L89)
-
-#### [Shell script example:](https://github.com/vahidhedayati/RemoteSSH/wiki/shell-script-example)
-
 ## [Demo site grails 2.4.4 remote-ssh:0.14](https://github.com/vahidhedayati/test-rssh)
 ## [Demo site grails 3.0.1 remote-ssh:3.0.1](https://github.com/vahidhedayati/testrssh)
 
+
+[How to use older revisions](https://github.com/vahidhedayati/RemoteSSH/docs/revisions/index.md)
 	
 #### For websocket live ssh connection / interaction: 
 Check out : [jssh](https://github.com/vahidhedayati/jssh)
 
-
-
-# Version Info
-```
-0.6:	Override methods added for executeCommand possibly causing issues depending on input/config
-
-0.5 :   typo: constraints - further clean up of code
-0.4 : 	Removed Map validateParams out and introduced src/groovy/RsshValidate - updated all calls to use new bean for validation.
-		Added try catch around new service methods - messages now caught and sent to frontend - no more stacktraces using new service.
-		
-0,3 : 	Implementation of RsshService + RsshTagLib easier/alternative calls to access plugin
-0.2 : 	Tidyup and throwables added by Tobias Tschech
-0.1 : 	Initial release - using src/groovy calls - a lot of tidy up by Burt Beckwith 
-```
