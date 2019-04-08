@@ -12,6 +12,9 @@ import java.util.concurrent.RunnableFuture
 
 class SshUtilService implements GrailsApplicationAware {
 
+    def sshExecutor
+    
+
     /**
      * 0.10 introduces initialise  which simplifies and wraps requirements in
      * SSHUtil class
