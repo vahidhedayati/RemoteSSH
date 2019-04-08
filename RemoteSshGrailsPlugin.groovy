@@ -3,7 +3,7 @@ import grails.plugin.remotessh.executor.ScheduledSshExecutor
 import grails.plugin.remotessh.executor.SshExecutor
 
 class RemoteSshGrailsPlugin {
-	def version = "0.13"
+	def version = "0.14"
 	def grailsVersion = "2.0 > *"
 	def title = "Remote SSH Plugin"
 	def author = "Vahid Hedayati"
