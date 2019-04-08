@@ -2,13 +2,16 @@ When executing http://localhost:8080/test-rssh/newWays
 This calls index method in test-rssh project:
 
 ```
+def sshUtilService
+	def	sshExecutor
+	def scheduledSshExecutor
 	/**
 	 * Tests latest currently 0.14
 	 * @return
 	 */
 	def index() {
 		boolean singleInstance=false
-		SSHUtil sshUtil = sshUtilService.initialise('username','password','localhost',22,singleInstance)
+		SSHUtil sshUtil = sshUtilService.initialise('mx1','password','localhost',22,singleInstance)
 		Map output=[:]
 		
 		//Either now like this
@@ -24,7 +27,7 @@ This calls index method in test-rssh project:
 		output.ranCommand2 = sshUtilService.execute(sshUtil,'echo "hi there return" > /tmp/backup-test-new/remote-file-example2.txt')
 		
 		//OR direct now you have sshUtil class:
-		output.ranCommand3 = """making dir 
+		output.ranCommand3 = """making dir
 			/tmp/backup-sshUtil """+sshUtil.execute('mkdir /tmp/backup-sshUtil')
 			
 		output.ranCommand4 = """Executing echo hi there from sshUtil to file:
@@ -53,16 +56,16 @@ This calls index method in test-rssh project:
 		output.ranCommand14 = """Executing echo hi to hidden file:
 			/tmp/.hiddenTest.txt """+sshUtil.execute('echo "hi" > /tmp/.hiddenTest.txt')
 			
-		output.readFile1 = """Reading remote file content of 
-			/tmp/test.txt: (using readRemoteFile) """+sshUtilService.readRemoteFile(sshUtil,'/tmp/test.txt')
+		output.readFile1 = """Reading remote file content of
+			/tmp/test2.txt: (using readRemoteFile) """+sshUtilService.readRemoteFile(sshUtil,'/tmp/test2.txt')
 			
-		output.readFile2 = """Reading remote file content of 
+		output.readFile2 = """Reading remote file content of
 			/tmp/test2.txt: (using readRemoteFile) """+sshUtil.readRemoteFile('/tmp/test2.txt')
 		
-		output.readFile3 = """Reading remote file content of 
+		output.readFile3 = """Reading remote file content of
 			/tmp/Kispálés.txt: (using readFile) """+sshUtilService.readFile(sshUtil,'/tmp/Kispálés.txt')
 			
-		output.readFile4 ="""Reading remote file content of 
+		output.readFile4 ="""Reading remote file content of
 			/tmp/Kispálés2.txt: (using readFile) """+ sshUtil.readFile('/tmp/Kispálés2.txt')
 		
 		
@@ -89,11 +92,11 @@ This calls index method in test-rssh project:
 			
 		
 		output.writeFile1 ="""Writing local file: /tmp/Kispálés.txt as 
-			/tmp/backup-test-new/ahha1.txt on 
+			/tmp/backup-test-new/ahha1.txt on
 			remote system"""+sshUtilService.writeFileWithName(sshUtil,'/tmp/Kispálés.txt','/tmp/backup-test-new/ahha1.txt')
 			
 		output.writeFile2 ="""Writing local file: /tmp/Kispálés.txt as 
-			/tmp/backup-test-new/ahha2.txt on 
+			/tmp/backup-test-new/ahha2.txt on
 			remote system"""+sshUtil.writeFileWithName('/tmp/Kispálés.txt','/tmp/backup-test-new/ahha2.txt')
 		
 		output.writeFile4 ="""putting file: '/tmp/Kispálés3.txt'
@@ -135,15 +138,15 @@ This calls index method in test-rssh project:
 		
 		//Boolean check if a file exists
 		output.fileExists1="""Does file Exist: 
-			/tmp/backup-test-new/remote-file-example.txt 
+			/tmp/backup-test-new/remote-file-example.txt
 			?"""+ sshUtilService.fileExists(sshUtil,'/tmp/backup-test-new/remote-file-example.txt')
 			
 		output.fileExists2= """Does file Exist: 
-			/tmp/backup-test-new/remote-file-example22.txt 
+			/tmp/backup-test-new/remote-file-example22.txt
 			?"""+sshUtilService.fileExists(sshUtil,'/tmp/backup-test-new/remote-file-example22.txt')
 			
 		output.fileExists3= """Does file Exist: 
-			/tmp/backup-test-new/remote-file-example.txt 
+			/tmp/backup-test-new/remote-file-example.txt
 			?"""+sshUtil.fileExists('/tmp/backup-test-new/remote-file-example.txt')
 		
 		
@@ -169,8 +172,8 @@ This calls index method in test-rssh project:
 			/tmp/remote/3/4/6 """+sshUtil.mkDirs('/tmp/remote/3/4/6')
 		
 		/**
-		 * Some additional stuff in 0.13+ please note the sshUtilService method by passing sshUtil could also be used in 
-		 * all examples cases below 
+		 * Some additional stuff in 0.13+ please note the sshUtilService method by passing sshUtil could also be used in
+		 * all examples cases below
 		 */
 		//hidden/notHidden file how to:
 		//sshUtil.isHiddenFile('path/file')
@@ -231,20 +234,31 @@ This calls index method in test-rssh project:
 		 * remotessh grails config with mySshConfigVar part of 0.11 release
 		 */
 		
-		/*
+		
 		SSHUtil sshUtil1 = new SSHUtil()
 		sshUtil1.configVariable='mySshConfigVar'
 		sshUtil1.initialise
 		// sshUtil.initialise('someHost',22)
 		sshUtil1.localFile='/tmp/test2.txt'
-		boolean doesItExist = sshUtil.fileExists()
+		boolean doesItExist = sshUtil1.fileExists()
 		println "file exists = ${doesItExist}"
 		sshUtil1.deleteRemoteFile('/tmp/test2.txt')
 		doesItExist = sshUtil1.fileExists()
 		println "file exists = ${doesItExist}"
 		sshUtil1.disconnect
 		
-		*/
+		
+		
+		SSHUtil sshUtil2 = new SSHUtil()
+		sshUtil2.configVariable='mySshConfigVar2'
+		sshUtil2.initialise
+		// sshUtil.initialise('someHost',22)
+		sshUtil2.localFile='/tmp/test3.txt'
+		boolean doesItExist1 = sshUtil2.fileExists()
+		println "/tmp/test3.txt using  mySshConfigVar2 file exists = ${doesItExist1}"
+		sshUtil2.disconnect
+		
+		
 
 		output.fileDateTime = 'Getting file date time for /tmp/test7.txt: '+\
 			sshUtil.getModificationDateTime('/tmp/test7.txt')
@@ -257,7 +271,7 @@ This calls index method in test-rssh project:
 		//output.setfileDateTime2 = 'Setting new Date using long value:'+\
 		//sshUtil.setModificationDateTime('/tmp/test7.txt', (new Date()+44).getTime())
 		
-		output.fileDateTime3 = 'Getting date again 3 : '+sshUtil.getModificationDateTime('/tmp/test7.txt')
+		//output.fileDateTime3 = 'Getting date again 3 : '+sshUtil.getModificationDateTime('/tmp/test7.txt')
 		
 		
 		output.filePermission = 'Getting file Permission /tmp/test7.txt: '+\
@@ -268,6 +282,13 @@ This calls index method in test-rssh project:
 			
 		output.fileUserId = 'Getting file Userid: '+\
 			sshUtil.getFileUserId('/tmp/test7.txt')
+			
+			output.setFileUserId = 'setFileUserId file Userid to root: '+\
+			sshUtil.setFileUserId('/tmp/test7.txt',33)
+			
+			output.fileUserId1 = 'Getting file Userid again: '+\
+			sshUtil.getFileUserId('/tmp/test7.txt')
+			
 			
 		output.setfilePermission = 'Setting file Permission /tmp/test7.txt to 755: '
 		sshUtil.setFilePermission('/tmp/test7.txt',755)
@@ -294,12 +315,167 @@ This calls index method in test-rssh project:
 		output.filePermissionString6 = 'Getting chmod file Permission /tmp/test7.txt: '+\
 				sshUtil.getPermission('/tmp/test7.txt')
 			
+		
 				
+				///Advanced topics 
+						
+		Priority priority = Priority.LOW
+				
+		SshRunnable currentTask = new SshRunnable({
+			sshUtil = new SSHUtil().initialise('mx1', 'password', 'localhost', 22, false)
+			sshUtil.localFile='/tmp/test3.txt'
+			sshUtil.fileExists()
+			sshUtil.createRemoteDirs('/tmp/v/a/h/i/d/99')
+			sshUtil.disconnect
+			})
+		RunnableFuture task = sshExecutor.execute(currentTask, priority.value)
+		def t =  task?.get()
+		
+				
+		/**
+		 * Below are some closure methods used in conjunction with Threaded Executable
+		 *  This is useful for background jobs that does not to be viewed as such
+		 *  since the tasks happen in external threads 
+		 * 		
+		 */
+				
+		/**
+		 * Threaded Executor with closure to carry out background tasks - to limit amount of concurrent ssh sessions
+		 * 
+		 * The initial methods call entire SSHUTil methods within closure and are totall thread safe
+		 * as present further down when we get file permissions after 2 disconnections within the closures
+		 * 		
+		 */				
+		Closure closure1 = {
+			//We have not declared sshUtil since it is used on this page above - 
+			// if no declaration above then in each closure it be like:
+			// SshUtil sshUtil = new SSHUtil().initialise('mx1', 'password', 'localhost', 22, false)
+			SSHUtil sshUtil5 = new SSHUtil().initialise('mx1', 'password', 'localhost', 22, false)
+			sshUtil5.localFile='/tmp/test3.txt'
+			sshUtil5.fileExists()
+			sshUtil5.createRemoteDirs('/tmp/v/a/h/i/d/1')
+			sshUtil5.disconnect
+		}
+		//Method 1
+		output.threadedExecutorResults1  = sshUtilService.threadedExecutor(closure1)
+	
+		
+		Closure closure2 = {
+			sshUtil = new SSHUtil().initialise('mx1', 'password', 'localhost', 22, false)
+			sshUtil.localFile='/tmp/test3.txt'
+			sshUtil.fileExists()
+			sshUtil.createRemoteDirs('/tmp/v/a/h/i/d/2')
+			sshUtil.disconnect
+		} 
+		// Method 2
+		output.threadedExecutorResults2  = sshUtilService.threadedExecutor(closure2, Priority.HIGHEST)
+
+		/**
+		 * Now we are calling the existing SSHUtil on this page to get the file permissions all over again
+		 * to demonstrate that this thread of sshUtil has nothing to do with above running tasks
+		 */
+		output.filePermissionString7 = 'Getting chmod file Permission  after closure with disconnections: /tmp/test7.txt: '+\
+		sshUtil.getPermission('/tmp/test7.txt')
+	
+		
+		
+		
+		//Advanced Threading topics
+		
+		println "going to schedule 1"
+		SshRunnable currentTaskAdvanced = new SshRunnable({
+			sshUtil = new SSHUtil().initialise('mx1', 'password', 'localhost', 22, false)
+			sshUtil.localFile='/tmp/test3.txt'
+			sshUtil.fileExists()
+			sshUtil.createRemoteDirs('/tmp/v/a/h/i/d/96')
+			sshUtil.disconnect
+			})
+		
+		println "going to schedule 1 start"
+		RunnableFuture advancedTask = scheduledSshExecutor.schedule(currentTaskAdvanced, 10 , TimeUnit.SECONDS )
+		//advancedTask?.get()
+		println "going to schedule 1 emnd"
+		
+		
+		SshRunnable currentTaskAdvanced1 = new SshRunnable({
+			sshUtil = new SSHUtil().initialise('mx1', 'password', 'localhost', 22, false)
+			sshUtil.localFile='/tmp/test3.txt'
+			sshUtil.fileExists()
+			sshUtil.createRemoteDirs('/tmp/v/a/h/i/d/97')
+			sshUtil.disconnect
+			})
+		println "going to schedule 2"
+		RunnableFuture advancedTask1 = scheduledSshExecutor.schedule(currentTaskAdvanced1, 25 , TimeUnit.SECONDS )
+		//advancedTask1?.get()
+		println "going to schedule 2"
+		
+		
+		
+		
+		
+		//--- Below methods are not thread safe
+		
+		/**
+		 * Below methods have been left but are not thread safe - the current SSHUtil is then passed to 
+		 * threadExecutor which launches / reuses the 1 current connection to do other things
+		 * it is kept since it is still using that 1 underlying connection created above
+		 */
+		
+		
+		/**
+		 * This is using existing connection from here which gets passed to external thread
+		 * and resets the connection as this connection so in effect connects here then sends to thread
+		 * when thread gets it uses this connection this is unlikely to be thread safe
+		 * Manually calling SSH Util the Threaded way of working -
+		 * Using threads to spread out ssh requests
+		 */
+		
+		Closure closure = {
+			sshUtil.createRemoteDirs('/tmp/v1/a1')
+		}
+		output.threadedExecutorResults4 = sshUtilService.threadedExecutor(sshUtil, closure)
+		
+		SshRunnable currentTask1 = new SshRunnable(sshUtil,sshUtil.connection,{sshUtil.createRemoteDirs('/tmp/v1/a2')})
+		RunnableFuture task1 = sshExecutor.execute(currentTask1, priority.value)
+		output.threadedExecutorResults3 =  task1?.get()
+		
+		//We are going to try to cheat and capture connection before disconnection
+		Connection existingConnectionBeforeDisconnection = sshUtil.connection
+		
+		//We are going to disconnect on this page
 		sshUtil.disconnect
+		
+		//Now using same connection within thread  - this will not work since already disconnected
+		/**
+		 * This is using existing connection from here which gets passed to external thread
+		 * and resets the connection as this connection so in effect connects here then sends to thread
+		 * when thread gets it uses this connection this is unlikely to be thread safe
+		 * Using sshUtilService to call threaded calls to ssh end points
+		 *
+		 */
+		Closure closure4 = {
+			sshUtil.createRemoteDirs('/tmp/v1/a3')
+		}
+		output.threadedExecutorResults5 = sshUtilService.threadedExecutor(sshUtil, closure4)
+		
+		//Again we try something similar but to reuse the existingConnection saved - again this will not work 
+		/**
+		 * This is calling or persisting the connection before disconnection above.
+		 */
+		Closure closure3 = {
+			sshUtil.createRemoteDirs('/tmp/v1/a4')
+		}
+		output.threadedExecutorResults6 = sshUtilService.threadedExecutor(sshUtil,
+			existingConnectionBeforeDisconnection, closure3)
+		
+		
+		sshUtil.disconnect
+		
 		JSON json = output as JSON
 		json.prettyPrint = true
 		json.render response
 	}
+	
 ```
 
 
@@ -309,7 +485,7 @@ The following output is produced:
 {
   "ranCommand": "",
   "ranCommand2": "",
-  "ranCommand3": "making dir \n\t\t\t/tmp/backup-sshUtil ",
+  "ranCommand3": "making dir\n\t\t\t/tmp/backup-sshUtil ",
   "ranCommand4": "Executing echo hi there from sshUtil to file:\n\t\t\t/tmp/test2.txt ",
   "ranCommand5": "Executing echo hi there from sshUtil to file:\n\t\t\t/tmp/Kispálés2.txt ",
   "ranCommand6": "Executing echo hi there from sshUtil test3 to file:\n\t\t\t/tmp/test3.txt ",
@@ -319,14 +495,14 @@ The following output is produced:
   "ranCommand12": "Executing echo hi there from sshUtil test4 to file:\n\t\t\t/tmp/test6.txt ",
   "ranCommand13": "Executing echo hi there from sshUtil test5 to file:\n\t\t\t/tmp/test7.txt ",
   "ranCommand14": "Executing echo hi to hidden file:\n\t\t\t/tmp/.hiddenTest.txt ",
-  "readFile1": "Reading remote file content of \n\t\t\t/tmp/test.txt: (using readRemoteFile) hi there\n",
-  "readFile2": "Reading remote file content of \n\t\t\t/tmp/test2.txt: (using readRemoteFile) hi there from sshUtil\n",
-  "readFile3": "Reading remote file content of \n\t\t\t/tmp/Kispálés.txt: (using readFile) hi there\n\u0000\u0000",
-  "readFile4": "Reading remote file content of \n\t\t\t/tmp/Kispálés2.txt: (using readFile) om sshUtil\n",
-  "writeFile1": "Writing local file: /tmp/Kispálés.txt as \n\t\t\t/tmp/backup-test-new/ahha1.txt on \n\t\t\tremote systemnull",
+  "readFile1": "Reading remote file content of\n\t\t\t/tmp/test2.txt: (using readRemoteFile) hi there from sshUtil\n",
+  "readFile2": "Reading remote file content of\n\t\t\t/tmp/test2.txt: (using readRemoteFile) hi there from sshUtil\n",
+  "readFile3": "Reading remote file content of\n\t\t\t/tmp/Kispálés.txt: (using readFile) hi there\n\u0000\u0000",
+  "readFile4": "Reading remote file content of\n\t\t\t/tmp/Kispálés2.txt: (using readFile) om sshUtil\n",
+  "writeFile1": "Writing local file: /tmp/Kispálés.txt as \n\t\t\t/tmp/backup-test-new/ahha1.txt on\n\t\t\tremote systemnull",
   "mkdir12": "Making recursive dir remote as\n\t\t\t\t/tmp/backup-test-new/alternative/abc null",
   "writeFile22": "Writing local file: /tmp/Kispálés.txt to remote dir \n\t\t\t/tmp/backup-test-new/alternative/null",
-  "writeFile2": "Writing local file: /tmp/Kispálés.txt as \n\t\t\t/tmp/backup-test-new/ahha2.txt on \n\t\t\tremote systemnull",
+  "writeFile2": "Writing local file: /tmp/Kispálés.txt as \n\t\t\t/tmp/backup-test-new/ahha2.txt on\n\t\t\tremote systemnull",
   "writeFile4": "putting file: '/tmp/Kispálés3.txt'\n\t\t\tto /tmp/backup-test-newnull",
   "writeFile5": "putting file: '/tmp/test3.txt'\n\t\t\tto /tmp/backup-test-new28",
   "writeFile6": "putting file: '/tmp/Kispálés3.txt'\n\t\t\tto /tmp/backup-test-newnull",
@@ -335,9 +511,9 @@ The following output is produced:
   "getRemoteFile2": null,
   "getRemoteFile3": "Getting REMOTE FILES: \n\t\t\t['/tmp/backup-test-new/remote-file-example2.txt',\n\t\t\t'/tmp/backup-test-new/remote-file-example.txt']  and copying to: /tmp/remote-got\n\t\tnull",
   "getRemoteFile4": "Getting REMOTE FILES: \n\t\t\t['/tmp/backup-test-new/remote-file-example2.txt',\n\t\t\t'/tmp/backup-test-new/remote-file-example.txt'] and copying to: /tmp/remote-got2\n\t\tnull",
-  "fileExists1": "Does file Exist: \n\t\t\t/tmp/backup-test-new/remote-file-example.txt \n\t\t\t?false",
-  "fileExists2": "Does file Exist: \n\t\t\t/tmp/backup-test-new/remote-file-example22.txt \n\t\t\t?false",
-  "fileExists3": "Does file Exist: \n\t\t\t/tmp/backup-test-new/remote-file-example.txt \n\t\t\t?false",
+  "fileExists1": "Does file Exist: \n\t\t\t/tmp/backup-test-new/remote-file-example.txt\n\t\t\t?false",
+  "fileExists2": "Does file Exist: \n\t\t\t/tmp/backup-test-new/remote-file-example22.txt\n\t\t\t?false",
+  "fileExists3": "Does file Exist: \n\t\t\t/tmp/backup-test-new/remote-file-example.txt\n\t\t\t?false",
   "remoteFileSize1": "remote file size: /tmp/test5.txt 28",
   "remoteFileSize2": "remote file size: /tmp/test5.txt 28",
   "deleteFile1": "remove remote file: \n\t\t\t/tmp/backup-test-new/remote-file-example.txt null",
@@ -356,13 +532,14 @@ The following output is produced:
   "removeDir1": "rmdir(folder) /tmp/remote/1/2/3 non recursivenull",
   "mkdir": "mkdir(folder) /tmp/remote/6  non recursivenull",
   "listNames4": "listFiles(folder) /tmp/backup-test-new[/tmp/backup-test-new/Kispálés.txt, /tmp/backup-test-new/test3.txt, /tmp/backup-test-new/Kispálés2.txt, /tmp/backup-test-new/test7.txt, /tmp/backup-test-new/test5.txt, /tmp/backup-test-new/test6.txt, /tmp/backup-test-new/alternative/Kispálés.txt, /tmp/backup-test-new/ahha1.txt, /tmp/backup-test-new/ahha2.txt, /tmp/backup-test-new/remote-file-example.txt, /tmp/backup-test-new/Kispálés3.txt, /tmp/backup-test-new/test4.txt, /tmp/backup-test-new/remote-file-example2.txt]",
-  "fileDateTime": "Getting file date time for /tmp/test7.txt: Fri Apr 12 10:09:21 BST 2019",
-  "setfileDateTime": "Setting new Date ->Fri Apr 12 10:22:42 BST 2019",
-  "fileDateTime1": "Getting date again 2 : Fri Apr 12 10:22:42 BST 2019",
-  "fileDateTime3": "Getting date again 3 : Fri Apr 12 10:22:42 BST 2019",
+  "fileDateTime": "Getting file date time for /tmp/test7.txt: Fri Apr 12 19:22:10 BST 2019",
+  "setfileDateTime": "Setting new Date ->Fri Apr 12 19:23:41 BST 2019",
+  "fileDateTime1": "Getting date again 2 : Fri Apr 12 19:23:41 BST 2019",
   "filePermission": "Getting file Permission /tmp/test7.txt: 644",
   "filePermissionString": "Getting chmod file Permission /tmp/test7.txt: rw- r-- r--",
   "fileUserId": "Getting file Userid: 1000",
+  "setFileUserId": "setFileUserId file Userid to root: null",
+  "fileUserId1": "Getting file Userid again: 1000",
   "setfilePermission": "Setting file Permission /tmp/test7.txt to 755: ",
   "filePermissionString4": "Getting chmod file Permission /tmp/test7.txt: rwx r-x r-x",
   "filePermission1": "Getting Human readable file Permission: 755",
@@ -370,6 +547,13 @@ The following output is produced:
   "filePermission3": "Getting file Decimal Permission: 33261",
   "filePermission5": "Getting file Binary Permission: 1000000111101101",
   "setfilePermission1": "Setting file Permission /tmp/test7.txt to 644: ",
-  "filePermissionString6": "Getting chmod file Permission /tmp/test7.txt: rw- r-- r--"
+  "filePermissionString6": "Getting chmod file Permission /tmp/test7.txt: rw- r-- r--",
+  "threadedExecutorResults1": null,
+  "threadedExecutorResults2": null,
+  "filePermissionString7": "Getting chmod file Permission  after closure with disconnections: /tmp/test7.txt: rw- r-- r--",
+  "threadedExecutorResults4": null,
+  "threadedExecutorResults3": null,
+  "threadedExecutorResults5": null,
+  "threadedExecutorResults6": null
 }
 ```

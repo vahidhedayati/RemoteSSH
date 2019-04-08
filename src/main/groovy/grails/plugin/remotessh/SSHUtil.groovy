@@ -18,7 +18,6 @@ import org.slf4j.LoggerFactory
  */
 
 class SSHUtil {
-
     protected String reply="OK"
     private String currentDirectory=""
     private static final Logger log = LoggerFactory.getLogger(this.class)
@@ -784,8 +783,8 @@ class SSHUtil {
                 line = stdOutRead.readLine()
             }
             session.waitForCondition(ChannelCondition.EXIT_STATUS, Long.MAX_VALUE)
-            int ret = session.getExitStatus()
-            if (ret != 0) {
+            Integer ret = session?.getExitStatus()
+            if (!ret || ret != 0) {
                 log.error("exec_error")
             }
             finaliseConnection()
@@ -949,6 +948,26 @@ class SSHUtil {
         }
         finaliseConnection()
         return uid
+    }
+
+    /**
+     * Your end user needs to have sufficient privileges
+     * The user does not have sufficient permissions to perform the operation.
+     * @param strFileName
+     * @param uid
+     */
+    void setFileUserId(String strFileName, int uid) {
+        try {
+            handle = client.openFileRW(strFileName)
+            SFTPv3FileAttributes objFA = client.fstat(handle)
+            objFA.uid=uid
+            client.fsetstat(handle,objFA)
+            client.closeFile(handle)
+        } catch (IOException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace()
+        }
+        finaliseConnection()
     }
 
 
@@ -1125,7 +1144,7 @@ class SSHUtil {
         }
         return client
     }
-    
+
     /**
      * 0.11 customised to lookup internal configVariable meaning default remotessh config key
      * can be overridden demonstrated in release-0.10.md

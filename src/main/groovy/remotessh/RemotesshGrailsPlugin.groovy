@@ -1,6 +1,8 @@
 package remotessh
 
 import grails.plugin.remotessh.SshConfig
+import grails.plugin.remotessh.executor.ScheduledSshExecutor
+import grails.plugin.remotessh.executor.SshExecutor
 import grails.plugins.*
 
 class RemotesshGrailsPlugin extends Plugin {
@@ -14,6 +16,8 @@ class RemotesshGrailsPlugin extends Plugin {
     def scm = [url: 'https://github.com/vahidhedayati/RemoteSSH']
     Closure doWithSpring() { {->
         sshConfig(SshConfig)
+        sshExecutor(SshExecutor)
+        scheduledSshExecutor(ScheduledSshExecutor)
         } 
     }
 }
