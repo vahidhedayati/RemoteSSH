@@ -12,6 +12,24 @@ def sshUtilService
 	def index() {
 		boolean singleInstance=false
 		SSHUtil sshUtil = sshUtilService.initialise('mx1','password','localhost',22,singleInstance)
+		
+		//Various ways of initialising sshUtil - if all in file use this simpler version
+		//SSHUtil sshUtil = sshUtilService.initialise
+		//SSHUtil sshUtil = sshUtilService.initialise('localhost',22,singleInstance)
+		//SSHUtil sshUtil = sshUtilService.initialise('localhost',22) //where this is false meaning remains open
+		//SSHUtil sshUtil = sshUtilService.initialise('username','password','localhost',22,singleInstance)
+		//SSHUtil sshUtil = sshUtilService.initialise('username','keyfile','keyFilePass','localhost',22,singleInstance)
+		SSHUtil sshUtil = sshUtilService.initialise('username','password','localhost',22 as int,singleInstance)
+		
+		// Or.... instantiate SSHUtil Directly like above but 
+		// SSHUtil sshUtil = new SSHUtil().initialise
+		// SSHUtil sshUtil = new SSHUtil().initialise('username','password','localhost',22,singleInstance)
+		
+		
+		//Now we have sshUtil it is equipped to either do things with the class loaded or through service:
+		
+		
+		
 		Map output=[:]
 		
 		//Either now like this
