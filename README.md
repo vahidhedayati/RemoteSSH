@@ -4,6 +4,12 @@ RemoteSSH
 Grails RemoteSSH Plugin based on Ganymed SSH-2 library 
 
 
+### Side note - similar / related projects
+- [RemoteSSH (this)](https://github.com/vahidhedayati/RemoteSSH)
+
+- [jssh](https://github.com/vahidhedayati/jssh)
+
+
 Dependency Grails 2:
 
 ```groovy
